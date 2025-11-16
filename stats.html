@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quizterra | Stats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: Poppins, sans-serif;
+      display: flex;
+      height: 100vh;
+      background: linear-gradient(120deg, #47a7ff, #745cff, #ff4ef2);
+      background-size: 400% 400%;
+      animation: gradientMove 11s ease infinite;
+      color: white;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(12px);
+      padding: 25px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    }
+    .sidebar h2 {
+      font-size: 36px; /* bigger Quizterra */
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: white;
+      opacity: 0.85;
+      font-size: 18px; /* normal size */
+      margin: 10px 0;
+      transition: 0.2s;
+    }
+    .sidebar a span { 
+      font-size: 20px; /* average size for emoji */
+    }
+    .sidebar a:hover { 
+      opacity: 1; 
+      transform: translateX(6px); 
+    }
+
+    /* MAIN AREA */
+    .main {
+      flex: 1;
+      padding: 50px;
+    }
+
+    /* User info */
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .user-info img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+    .user-info h2 { font-size: 28px; font-weight: 700; }
+
+    /* Stats cards layout */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      padding: 22px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+    }
+    .card h3 { font-size: 24px; margin-bottom: 10px; font-weight: 700; }
+    .stat { font-size: 36px; font-weight: 700; }
+
+    @media(max-width: 1000px){
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media(max-width: 650px){
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>Quizterra</h2>
+    <a href="index.html"><span>🏠</span> Home</a>
+    <a href="stats.html"><span>📊</span> Stats</a>
+    <a href="packs.html"><span>🎒</span> Packs</a>
+    <a href="profile.html"><span>👤</span> Profile</a>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="user-info">
+      <img id="profilePic" src="" alt="Profile Picture">
+      <h2 id="username">USERNAME</h2>
+    </div>
+
+    <div class="stats-grid">
+      <div class="card"><h3>Level</h3><div class="stat" id="level">0</div></div>
+      <div class="card"><h3>XP</h3><div class="stat" id="xp">0</div></div>
+      <div class="card"><h3>Coins</h3><div class="stat" id="coins">0</div></div>
+      <div class="card"><h3>Games Played</h3><div class="stat" id="gamesPlayed">0</div></div>
+      <div class="card"><h3>Correct Answers</h3><div class="stat" id="correct">0</div></div>
+      <div class="card"><h3>Wrong Answers</h3><div class="stat" id="wrong">0</div></div>
+    </div>
+  </div>
+
+  <script>
+    window.onload = () => {
+      const user = JSON.parse(localStorage.getItem("quizterraUser"));
+
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Show username and profile picture
+      document.getElementById("username").innerText = user.username || "UNKNOWN";
+      document.getElementById("profilePic").src = user.picture || "";
+
+      // Initialize stats if missing
+      if (!user.stats) {
+        user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0 };
+        localStorage.setItem("quizterraUser", JSON.stringify(user));
+      }
+
+      const stats = user.stats;
+
+      function countUp(element, end) {
+        let start = 0;
+        let step = Math.ceil(end / 30);
+        const interval = setInterval(() => {
+          start += step;
+          if (start >= end) { element.innerText = end; clearInterval(interval); }
+          else element.innerText = start;
+        }, 20);
+      }
+
+      countUp(document.getElementById("level"), stats.level);
+      countUp(document.getElementById("xp"), stats.xp);
+      countUp(document.getElementById("coins"), stats.coins);
+      countUp(document.getElementById("gamesPlayed"), stats.gamesPlayed);
+      countUp(document.getElementById("correct"), stats.correct);
+      countUp(document.getElementById("wrong"), stats.wrong);
+    };
+  </script>
+
+</body>
+</html>
