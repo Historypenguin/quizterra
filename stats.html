@@ -2,225 +2,233 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Quizterra | Stats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizterra | Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <!-- FONT AWESOME -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <style>
     body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #6a5acd, #00bfff);
+      color: white;
       margin: 0;
-      font-family: Poppins, sans-serif;
+      padding: 0;
       display: flex;
-      height: 100vh;
-      background: linear-gradient(120deg, #47a7ff, #745cff, #ff4ef2);
-      background-size: 400% 400%;
-      animation: gradientMove 11s ease infinite;
-      color: white;
-    }
-
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* SIDEBAR — Dark Blue */
-    .sidebar {
-      width: 260px;
-      background: #002b6f;
-      padding: 25px;
-      height: 100vh;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
-    }
-
-    .sidebar h2 {
-      font-size: 40px;
-      margin-bottom: 35px;
-      color: #0fa6ff;
-      font-weight: 900;
-      letter-spacing: 1px;
-    }
-
-    .sidebar a {
-      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: white;
-      font-size: 22px;
+      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      font-size: 2rem;
       font-weight: 700;
-      padding: 12px 15px;
-      border-radius: 12px;
-      margin-bottom: 18px;
-      transition: 0.25s;
-      cursor: pointer;
+      background: rgba(0,0,0,0.2);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    .sidebar a i {
-      font-size: 24px;
-    }
-
-    .sidebar a:hover {
-      background: rgba(255,255,255,0.15);
-    }
-
-    .sidebar a.active {
-      background: rgba(255,255,255,0.2);
-    }
-
-    .main {
-      flex: 1;
-      padding: 50px;
-    }
-
-    .user-info {
+    .profile {
       display: flex;
       align-items: center;
-      gap: 20px;
-      margin-bottom: 40px;
+      margin: 20px;
+      gap: 15px;
     }
 
-    .user-info img {
-      width: 80px;
-      height: 80px;
+    .profile img {
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       border: 2px solid white;
     }
 
-    .user-info h2 {
-      font-size: 28px;
-      font-weight: 700;
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      max-width: 900px;
+      margin-bottom: 20px;
     }
 
-    /* Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 25px;
-    }
-
-    .card {
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      padding: 22px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    .stat-box {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 12px;
+      width: 120px;
       text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+    .stat-box h2 {
+      margin: 0;
+      font-size: 1.5rem;
     }
 
-    .card h3 {
-      font-size: 24px;
-      margin-bottom: 10px;
-      font-weight: 700;
+    .buttons {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
     }
 
-    .stat {
-      font-size: 36px;
-      font-weight: 700;
+    button {
+      padding: 15px 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
 
-    @media(max-width: 1000px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    #claimTokensBtn {
+      background: white;
+      color: #6a5acd;
     }
 
-    @media(max-width: 650px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
+    #claimTokensBtn:disabled {
+      background: rgba(255,255,255,0.5);
+      cursor: not-allowed;
+    }
+
+    #logoutBtn {
+      background: #ff4c4c;
+      color: white;
+    }
+
+    button:hover:not(:disabled) {
+      transform: scale(1.05);
     }
   </style>
 </head>
-
 <body>
+  <header>Quizterra Dashboard</header>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <h2>QUIZTERRA</h2>
-
-    <a href="stats.html" class="active"><i class="fas fa-chart-line"></i> Stats</a>
-    <a href="market.html"><i class="fas fa-store"></i> Market</a>
-    <a href="quizzes.html"><i class="fas fa-box"></i> Quizzes</a>
-    <a href="sets.html"><i class="fas fa-layer-group"></i> Sets</a>
-
-    <!-- LOGOUT BUTTON -->
-    <a id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  <div class="profile">
+    <img id="profilePic" src="" alt="Profile Picture">
+    <span id="username">USERNAME</span>
   </div>
 
-  <!-- MAIN -->
-  <div class="main">
-    <div class="user-info">
-      <img id="profilePic" src="" alt="Profile Picture">
-      <h2 id="username">USERNAME</h2>
+  <div class="stats">
+    <div class="stat-box">
+      <div>Level</div>
+      <h2 id="level">0</h2>
     </div>
-
-    <div class="stats-grid">
-      <div class="card"><h3>Level</h3><div class="stat" id="level">0</div></div>
-      <div class="card"><h3>XP</h3><div class="stat" id="xp">0</div></div>
-      <div class="card"><h3>Coins</h3><div class="stat" id="coins">0</div></div>
-      <div class="card"><h3>Games Played</h3><div class="stat" id="gamesPlayed">0</div></div>
-      <div class="card"><h3>Correct Answers</h3><div class="stat" id="correct">0</div></div>
-      <div class="card"><h3>Wrong Answers</h3><div class="stat" id="wrong">0</div></div>
+    <div class="stat-box">
+      <div>XP</div>
+      <h2 id="xp">0</h2>
+    </div>
+    <div class="stat-box">
+      <div>Tokens</div>
+      <h2 id="coins">0</h2>
+    </div>
+    <div class="stat-box">
+      <div>Games Played</div>
+      <h2 id="gamesPlayed">0</h2>
+    </div>
+    <div class="stat-box">
+      <div>Correct</div>
+      <h2 id="correct">0</h2>
+    </div>
+    <div class="stat-box">
+      <div>Wrong</div>
+      <h2 id="wrong">0</h2>
     </div>
   </div>
 
-  <!-- SCRIPT -->
+  <div class="buttons">
+    <button id="claimTokensBtn">Claim Tokens</button>
+    <button id="logoutBtn">Logout</button>
+  </div>
+
   <script>
-    window.onload = () => {
-      const user = JSON.parse(localStorage.getItem("quizterraUser"));
+    // Simulated login check
+    if (!localStorage.getItem("quizterraUser")) {
+      localStorage.setItem("quizterraUser", JSON.stringify({
+        username: "Player1",
+        picture: "https://i.postimg.cc/3x3QzSGq/profile.png",
+        stats: {
+          level: 1,
+          xp: 50,
+          coins: 0,
+          gamesPlayed: 0,
+          correct: 0,
+          wrong: 0,
+          lastClaim: null
+        }
+      }));
+    }
 
-      if (!user) {
-        window.location.href = "login.html";
-        return;
+    const user = JSON.parse(localStorage.getItem("quizterraUser"));
+    const stats = user.stats;
+
+    document.getElementById("username").innerText = user.username;
+    document.getElementById("profilePic").src = user.picture;
+
+    function countUp(element, end) {
+      let start = 0;
+      const step = Math.ceil(end / 30);
+      const interval = setInterval(() => {
+        start += step;
+        if (start >= end) {
+          element.innerText = end;
+          clearInterval(interval);
+        } else {
+          element.innerText = start;
+        }
+      }, 20);
+    }
+
+    countUp(document.getElementById("level"), stats.level);
+    countUp(document.getElementById("xp"), stats.xp);
+    countUp(document.getElementById("coins"), stats.coins);
+    countUp(document.getElementById("gamesPlayed"), stats.gamesPlayed);
+    countUp(document.getElementById("correct"), stats.correct);
+    countUp(document.getElementById("wrong"), stats.wrong);
+
+    const claimBtn = document.getElementById("claimTokensBtn");
+
+    function updateClaimButton() {
+      if (stats.lastClaim) {
+        const now = new Date().getTime();
+        const timePassed = now - stats.lastClaim;
+        if (timePassed < 24*60*60*1000) {
+          claimBtn.disabled = true;
+          const remaining = 24*60*60*1000 - timePassed;
+
+          const hours = Math.floor(remaining / (1000*60*60));
+          const minutes = Math.floor((remaining % (1000*60*60)) / (1000*60));
+          const seconds = Math.floor((remaining % (1000*60)) / 1000);
+
+          claimBtn.innerText = `Claim in ${hours}h ${minutes}m ${seconds}s`;
+
+          setTimeout(updateClaimButton, 1000);
+        } else {
+          claimBtn.disabled = false;
+          claimBtn.innerText = "Claim Tokens";
+        }
       }
+    }
 
-      document.getElementById("username").innerText = user.username || "UNKNOWN";
-      document.getElementById("profilePic").src = user.picture || "";
+    updateClaimButton();
 
-      if (!user.stats) {
-        user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0 };
+    claimBtn.onclick = () => {
+      const now = new Date().getTime();
+      if (!stats.lastClaim || (now - stats.lastClaim) >= 24*60*60*1000) {
+        stats.coins += 1000;
+        stats.lastClaim = now;
         localStorage.setItem("quizterraUser", JSON.stringify(user));
+        document.getElementById("coins").innerText = stats.coins;
+        updateClaimButton();
+        alert("You claimed 1000 tokens! Come back tomorrow for more.");
       }
-
-      const stats = user.stats;
-
-      function countUp(element, end) {
-        let start = 0;
-        let step = Math.ceil(end / 30);
-        const interval = setInterval(() => {
-          start += step;
-          if (start >= end) {
-            element.innerText = end;
-            clearInterval(interval);
-          } else {
-            element.innerText = start;
-          }
-        }, 20);
-      }
-
-      countUp(document.getElementById("level"), stats.level);
-      countUp(document.getElementById("xp"), stats.xp);
-      countUp(document.getElementById("coins"), stats.coins);
-      countUp(document.getElementById("gamesPlayed"), stats.gamesPlayed);
-      countUp(document.getElementById("correct"), stats.correct);
-      countUp(document.getElementById("wrong"), stats.wrong);
     };
 
-    // LOGOUT
     document.getElementById("logoutBtn").onclick = () => {
       localStorage.removeItem("quizterraUser");
-      window.location.href = "login.html";
+      location.reload();
     };
   </script>
-
 </body>
 </html>
