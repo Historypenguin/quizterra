@@ -5,6 +5,9 @@
   <title>Quizterra | Stats</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
+  <!-- FONT AWESOME -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
     body {
       margin: 0;
@@ -54,8 +57,9 @@
       transition: 0.25s;
     }
 
-    .sidebar a span {
-      font-size: 26px;
+    /* Icon size */
+    .sidebar a i {
+      font-size: 24px;
     }
 
     .sidebar a:hover {
@@ -66,7 +70,6 @@
       background: rgba(255,255,255,0.2);
     }
 
-    /* MAIN AREA */
     .main {
       flex: 1;
       padding: 50px;
@@ -92,7 +95,7 @@
       font-weight: 700;
     }
 
-    /* Stats Grid */
+    /* Stats */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -146,10 +149,10 @@
   <div class="sidebar">
     <h2>QUIZTERRA</h2>
 
-    <a href="index.html"><span>🏠</span> Home</a>
-    <a href="stats.html" class="active"><span>📊</span> Stats</a>
-    <a href="packs.html"><span>🎒</span> Packs</a>
-    <a href="profile.html"><span>👤</span> Profile</a>
+    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+    <a href="stats.html" class="active"><i class="fas fa-chart-line"></i> Stats</a>
+    <a href="packs.html"><i class="fas fa-box-open"></i> Packs</a>
+    <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
   </div>
 
   <!-- MAIN -->
