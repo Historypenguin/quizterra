@@ -72,8 +72,39 @@
 <body>
   <div class="market-container">
     <h1>Foodit Market</h1>
-    <div id="packs">
-      <!-- Packs will be dynamically inserted here -->
+      <div class="token-display">🪙 Tokens: <span id="token-count">0</span></div>
+    <div class="pack-container" >
+      <div id="packs">
+      <div class="pack" id="thanksgiving-pack" onclick="buyPack('thanksgiving', this)">
+        <img src="https://i.postimg.cc/V6QN8H3P/thanksgiving-Pack-1.png" alt="Thanksgiving Pack" />
+        <div class="pack-name">Thanksgiving Pack</div>
+        <div class="pack-price">💰 50 Tokens</div>
+      </div>
+      <div class="pack" id="food-pack" onclick="buyPack('food', this)">
+        <img src="https://i.postimg.cc/NF8d3FQB/foodPack.png" alt="Food Pack" />
+        <div class="pack-name">Food Pack</div>
+        <div class="pack-price">💰 30 Tokens</div>
+      </div>
+      <div class="pack" id="donut-pack" onclick="buyPack('donut', this)">
+        <img src="https://i.postimg.cc/N0znbQ4x/donut-Pack.png" alt="Donut Pack" />
+        <div class="pack-name">Donut Pack</div>
+        <div class="pack-price">💰 30 Tokens</div>
+      </div>
+       <div class="pack" id="og-pack" onclick="buyPack('og', this)">
+        <img src="https://i.postimg.cc/76kp7h17/download-6.png" alt="OG Pack" />
+        <div class="pack-name">OG Pack</div>
+        <div class="pack-price">💰 30 Tokens</div>
+      </div>
+      <div class="pack" id="space-pack" onclick="buyPack('space', this)">
+        <img src="https://i.postimg.cc/dQzD6Hpd/spacepack.webp" alt="Space Pack" />
+        <div class="pack-name">Space Pack</div>
+        <div class="pack-price">💰 30 Tokens</div>
+      </div>
+      <div class="pack" id="milk-pack" onclick="buyPack('milk', this)">
+        <img src="https://cdn.glitch.global/9aba0bca-3e6a-4f92-ba3a-681225c4dc31/thumbnails%2Fmilkpack.webp" alt="Milk Pack" />
+        <div class="pack-name">Milk Pack</div>
+        <div class="pack-price">💰 30 Tokens</div>
+      </div>
     </div>
     <div class="blook-grid" id="blook-display">
       <!-- Opened blooks will display here -->
