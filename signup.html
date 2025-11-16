@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quizterra | Sign Up</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(120deg, #47a7ff, #745cff, #ff4ef2);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+      min-height: 100vh;
+      text-align: center;
+      padding-top: 100px;
+      color: white;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .google-btn { margin-top: 30px; display:inline-flex; align-items:center; gap:12px; background:white; color:#222; border-radius:50px; padding:18px 36px; font-size:22px; font-weight:700; cursor:pointer; border:none; transition:0.25s; }
+    .google-btn img { width:28px; }
+    .google-btn:hover { transform: scale(1.07); }
+  </style>
+</head>
+<body>
+
+<h1>Welcome to Quizterra</h1>
+<p>Sign in with Google to begin!</p>
+
+<div id="g_id_signin"></div>
+
+<script>
+  function handleCredentialResponse(response) {
+    const user = JSON.parse(atob(response.credential.split(".")[1]));
+
+    // Check if username already exists
+    let existingData = JSON.parse(localStorage.getItem("quizterraUser"));
+
+    if (!existingData || !existingData.username) {
+      let username = "";
+
+      // Ask until valid
+      while (true) {
+        username = prompt("Please put in your username (must be exactly 10 letters):");
+
+        if (username === null) {
+          alert("You must enter a username to continue.");
+          continue;
+        }
+
+        // Validate: must be 10 letters only
+        if (/^[A-Za-z]{10}$/.test(username)) break;
+        else alert("Username must be exactly 10 LETTERS — no numbers, no symbols.");
+      }
+
+      // Save user data + username
+      localStorage.setItem("quizterraUser", JSON.stringify({
+        name: user.name,
+        email: user.email,
+        picture: user.picture,
+        username: username
+      }));
+    }
+
+    // Redirect to stats
+    window.location.href = "stats.html";
+  }
+
+  window.onload = function() {
+    google.accounts.id.initialize({
+      client_id: "281461594707-shb4iadtbtev48ue1bo2ltbv7bpk9um4.apps.googleusercontent.com",
+      callback: handleCredentialResponse
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById("g_id_signin"),
+      { theme: "outline", size: "large" }
+    );
+
+    google.accounts.id.prompt();
+  }
+</script>
+
+</body>
+</html>
