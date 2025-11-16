@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quizterra | Inventory</title>
+  <title>Packs | Foodit</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet" />
 
@@ -68,89 +68,70 @@
       overflow-y: auto;
     }
 
-    /* PACKS & BLOOKS */
-    .pack-section {
+    /* PACKS GRID */
+    .packs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .pack-card {
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(10px);
       border-radius: 25px;
-      padding: 20px;
-      margin-bottom: 25px;
+      padding: 25px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .pack-card:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
     }
 
     .pack-title {
       font-family: 'Titan One', cursive;
-      font-size: 22px;
-      margin-bottom: 15px;
-      border-bottom: 2px solid white;
-      padding-bottom: 5px;
+      font-size: 20px;
+      margin-bottom: 10px;
     }
 
-    .blooks-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-
-    .blook-item {
-      width: 100px;
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      padding: 10px;
-      border-radius: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
-    }
-
-    .blook-item:hover {
-      transform: translateY(-8px) scale(1.05);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-      background: rgba(255,255,255,0.3);
-    }
-
-    .blook-item img {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-      background: white;
-      border-radius: 15px;
-      margin-bottom: 6px;
-    }
-
-    .blook-name { font-family: 'Titan One', cursive; font-size: 14px; color: white; }
-
+    /* DETAILS PANEL */
     .details-panel {
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(12px);
       border-radius: 25px;
-      padding: 30px;
+      padding: 20px;
       margin-top: 20px;
       display: none;
       flex-direction: column;
       align-items: center;
     }
 
-    .details-panel img { width: 160px; height: 160px; object-fit: contain; border-radius: 20px; margin-bottom: 15px; }
-    .details-name { font-size: 26px; font-family: 'Titan One', cursive; margin-bottom: 15px; }
-    .sell-button {
-      background: linear-gradient(135deg, #6a5acd, #00bfff);
-      border: none;
-      color: white;
-      font-family: 'Titan One', cursive;
-      font-size: 18px;
-      padding: 12px 30px;
-      border-radius: 15px;
-      cursor: pointer;
-      margin: 10px 0;
-      transition: all 0.3s ease;
+    .details-panel h2 { margin-bottom: 20px; font-family: 'Titan One', cursive; }
+    .blooks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 15px;
+      width: 100%;
     }
-    .sell-button:hover { transform: scale(1.08); box-shadow: 0 15px 25px rgba(0,0,0,0.4); }
-    .set-profile-button { background: #28a745; }
+
+    .blook-item {
+      background: rgba(255,255,255,0.2);
+      padding: 10px;
+      border-radius: 15px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .blook-item:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    }
 
     @media(max-width: 768px) {
       .sidebar { width: 180px; }
       .main { padding: 20px; }
-      .blooks-grid { justify-content: center; }
     }
   </style>
 </head>
@@ -160,7 +141,7 @@
     <div class="logo">FOODIT</div>
     <a href="#"><i class="fas fa-chart-line"></i> Stats</a>
     <a href="#"><i class="fas fa-store"></i> Market</a>
-    <a href="#" class="active"><i class="fas fa-utensils"></i> Foods</a>
+    <a href="#" class="active"><i class="fas fa-utensils"></i> Packs</a>
     <a href="#"><i class="fas fa-comment"></i> Chat</a>
     <a href="#"><i class="fas fa-cog"></i> Settings</a>
     <a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -168,15 +149,11 @@
 
   <!-- MAIN CONTENT -->
   <div class="main">
-    <div id="packs-container"></div>
+    <div class="packs-grid" id="packs-grid"></div>
 
     <div class="details-panel" id="details-panel">
-      <img id="detail-img" src="" alt="Blook Image" />
-      <div class="details-name" id="detail-name"></div>
-      <input type="number" id="sell-qty" placeholder="How many to sell" min="1" />
-      <button class="sell-button" id="sell-button">Sell</button>
-      <button class="sell-button set-profile-button" id="set-profile">Set Profile</button>
-      <button class="sell-button" id="list-button">List</button>
+      <h2 id="pack-name"></h2>
+      <div class="blooks-grid" id="blooks-container"></div>
     </div>
   </div>
 
@@ -193,45 +170,34 @@
       "Blizzard Pack": ["Cool Santa","Holiday Cat","Holiday Frog","Santa Gummy","Golden Hot Chocolate","Blooket Christmas Snow Globe","Evil Snowman","Santa Bot","Frozen Crab","Frozen Deer","Frozen Monster","Frozen Owl","Frozen Shark","Golden Wreath","Desert Snow Globe","Turtle Clause"]
     };
 
-    const packsContainer = document.getElementById("packs-container");
+    const packsGrid = document.getElementById("packs-grid");
     const detailsPanel = document.getElementById("details-panel");
-    const detailName = document.getElementById("detail-name");
+    const packNameTitle = document.getElementById("pack-name");
+    const blooksContainer = document.getElementById("blooks-container");
 
-    function renderPacks() {
-      packsContainer.innerHTML = "";
-      for (const packName in packs) {
-        const section = document.createElement("div");
-        section.className = "pack-section";
-
-        const title = document.createElement("div");
-        title.className = "pack-title";
-        title.innerText = packName;
-        section.appendChild(title);
-
-        const grid = document.createElement("div");
-        grid.className = "blooks-grid";
-
-        packs[packName].forEach(blookName => {
-          const div = document.createElement("div");
-          div.className = "blook-item";
-          div.innerHTML = `<div class="blook-name">${blookName}</div>`;
-          div.addEventListener("click", () => openDetails(blookName));
-          grid.appendChild(div);
-        });
-
-        section.appendChild(grid);
-        packsContainer.appendChild(section);
-      }
+    // Render packs as cards
+    for (const packName in packs) {
+      const card = document.createElement("div");
+      card.className = "pack-card";
+      card.innerHTML = `<div class="pack-title">${packName}</div>`;
+      card.addEventListener("click", () => openPack(packName));
+      packsGrid.appendChild(card);
     }
 
-    function openDetails(blookName) {
-      detailName.innerText = blookName;
+    function openPack(packName) {
+      packNameTitle.innerText = packName;
+      blooksContainer.innerHTML = "";
+      packs[packName].forEach(blook => {
+        const blookDiv = document.createElement("div");
+        blookDiv.className = "blook-item";
+        blookDiv.innerText = blook;
+        blooksContainer.appendChild(blookDiv);
+      });
       detailsPanel.style.display = "flex";
+      detailsPanel.scrollIntoView({ behavior: "smooth" });
     }
 
-    document.getElementById("logout-link").onclick = () => alert("Logged out! (implement logout logic)");
-
-    renderPacks();
+    document.getElementById("logout-link").onclick = () => alert("Logged out!");
   </script>
 </body>
 </html>
