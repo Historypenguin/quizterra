@@ -3,36 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quizterra | Dashboard</title>
+  <title>Foodit | Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
+      margin: 0;
       font-family: 'Poppins', sans-serif;
+      display: flex;
+      min-height: 100vh;
       background: linear-gradient(135deg, #6a5acd, #00bfff);
       color: white;
-      margin: 0;
-      padding: 0;
+    }
+
+    /* Sidebar CSS */
+    .sidebar {
+      width: 250px;
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    }
+
+    .sidebar h2 {
+      margin: 0 0 20px 0;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    .sidebar button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    .sidebar button:hover:not(:disabled) {
+      background: rgba(255,255,255,0.4);
+    }
+
+    .sidebar button:disabled {
+      background: rgba(255,255,255,0.1);
+      cursor: not-allowed;
+    }
+
+    /* Main content */
+    .main-content {
+      flex: 1;
+      padding: 30px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
-    }
-
-    header {
-      width: 100%;
-      padding: 20px;
-      text-align: center;
-      font-size: 2rem;
-      font-weight: 700;
-      background: rgba(0,0,0,0.2);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
     .profile {
       display: flex;
       align-items: center;
-      margin: 20px;
       gap: 15px;
+      margin-bottom: 20px;
     }
 
     .profile img {
@@ -47,8 +80,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 20px;
-      max-width: 900px;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     .stat-box {
@@ -65,87 +97,53 @@
       margin: 0;
       font-size: 1.5rem;
     }
-
-    .buttons {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    button {
-      padding: 15px 25px;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    #claimTokensBtn {
-      background: white;
-      color: #6a5acd;
-    }
-
-    #claimTokensBtn:disabled {
-      background: rgba(255,255,255,0.5);
-      cursor: not-allowed;
-    }
-
-    #logoutBtn {
-      background: #ff4c4c;
-      color: white;
-    }
-
-    button:hover:not(:disabled) {
-      transform: scale(1.05);
-    }
   </style>
 </head>
 <body>
-  <header>Quizterra Dashboard</header>
-
-  <div class="profile">
-    <img id="profilePic" src="" alt="Profile Picture">
-    <span id="username">USERNAME</span>
-  </div>
-
-  <div class="stats">
-    <div class="stat-box">
-      <div>Level</div>
-      <h2 id="level">0</h2>
-    </div>
-    <div class="stat-box">
-      <div>XP</div>
-      <h2 id="xp">0</h2>
-    </div>
-    <div class="stat-box">
-      <div>Tokens</div>
-      <h2 id="coins">0</h2>
-    </div>
-    <div class="stat-box">
-      <div>Games Played</div>
-      <h2 id="gamesPlayed">0</h2>
-    </div>
-    <div class="stat-box">
-      <div>Correct</div>
-      <h2 id="correct">0</h2>
-    </div>
-    <div class="stat-box">
-      <div>Wrong</div>
-      <h2 id="wrong">0</h2>
-    </div>
-  </div>
-
-  <div class="buttons">
+  <div class="sidebar">
+    <h2>Foodit</h2>
     <button id="claimTokensBtn">Claim Tokens</button>
     <button id="logoutBtn">Logout</button>
   </div>
 
+  <div class="main-content">
+    <div class="profile">
+      <img id="profilePic" src="" alt="Profile Picture">
+      <span id="username">USERNAME</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat-box">
+        <div>Level</div>
+        <h2 id="level">0</h2>
+      </div>
+      <div class="stat-box">
+        <div>XP</div>
+        <h2 id="xp">0</h2>
+      </div>
+      <div class="stat-box">
+        <div>Tokens</div>
+        <h2 id="coins">0</h2>
+      </div>
+      <div class="stat-box">
+        <div>Games Played</div>
+        <h2 id="gamesPlayed">0</h2>
+      </div>
+      <div class="stat-box">
+        <div>Correct</div>
+        <h2 id="correct">0</h2>
+      </div>
+      <div class="stat-box">
+        <div>Wrong</div>
+        <h2 id="wrong">0</h2>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Simulated login check
-    if (!localStorage.getItem("quizterraUser")) {
-      localStorage.setItem("quizterraUser", JSON.stringify({
+    // Initialize or load user data
+    if (!localStorage.getItem("fooditUser")) {
+      localStorage.setItem("fooditUser", JSON.stringify({
         username: "Player1",
         picture: "https://i.postimg.cc/3x3QzSGq/profile.png",
         stats: {
@@ -160,7 +158,7 @@
       }));
     }
 
-    const user = JSON.parse(localStorage.getItem("quizterraUser"));
+    const user = JSON.parse(localStorage.getItem("fooditUser"));
     const stats = user.stats;
 
     document.getElementById("username").innerText = user.username;
@@ -208,6 +206,9 @@
           claimBtn.disabled = false;
           claimBtn.innerText = "Claim Tokens";
         }
+      } else {
+        claimBtn.disabled = false;
+        claimBtn.innerText = "Claim Tokens";
       }
     }
 
@@ -218,7 +219,7 @@
       if (!stats.lastClaim || (now - stats.lastClaim) >= 24*60*60*1000) {
         stats.coins += 1000;
         stats.lastClaim = now;
-        localStorage.setItem("quizterraUser", JSON.stringify(user));
+        localStorage.setItem("fooditUser", JSON.stringify(user));
         document.getElementById("coins").innerText = stats.coins;
         updateClaimButton();
         alert("You claimed 1000 tokens! Come back tomorrow for more.");
@@ -226,7 +227,7 @@
     };
 
     document.getElementById("logoutBtn").onclick = () => {
-      localStorage.removeItem("quizterraUser");
+      localStorage.removeItem("fooditUser");
       location.reload();
     };
   </script>
