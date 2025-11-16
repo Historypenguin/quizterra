@@ -71,7 +71,7 @@
     /* PACKS GRID */
     .packs-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 20px;
     }
 
@@ -79,14 +79,14 @@
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(10px);
       border-radius: 25px;
-      padding: 25px;
+      padding: 20px;
       text-align: center;
       cursor: pointer;
       transition: transform 0.3s, box-shadow 0.3s;
     }
 
     .pack-card:hover {
-      transform: translateY(-5px) scale(1.05);
+      transform: translateY(-5px) scale(1.03);
       box-shadow: 0 15px 30px rgba(0,0,0,0.4);
     }
 
@@ -96,24 +96,13 @@
       margin-bottom: 10px;
     }
 
-    /* DETAILS PANEL */
-    .details-panel {
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(12px);
-      border-radius: 25px;
-      padding: 20px;
-      margin-top: 20px;
+    /* EXPANDABLE BLOOKS */
+    .blooks-container {
       display: none;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .details-panel h2 { margin-bottom: 20px; font-family: 'Titan One', cursive; }
-    .blooks-grid {
+      margin-top: 15px;
+      gap: 10px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 15px;
-      width: 100%;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     }
 
     .blook-item {
@@ -122,10 +111,11 @@
       border-radius: 15px;
       text-align: center;
       transition: transform 0.3s, box-shadow 0.3s;
+      font-size: 14px;
     }
 
     .blook-item:hover {
-      transform: translateY(-5px) scale(1.05);
+      transform: translateY(-3px) scale(1.05);
       box-shadow: 0 10px 20px rgba(0,0,0,0.4);
     }
 
@@ -150,11 +140,6 @@
   <!-- MAIN CONTENT -->
   <div class="main">
     <div class="packs-grid" id="packs-grid"></div>
-
-    <div class="details-panel" id="details-panel">
-      <h2 id="pack-name"></h2>
-      <div class="blooks-grid" id="blooks-container"></div>
-    </div>
   </div>
 
   <script>
@@ -171,30 +156,33 @@
     };
 
     const packsGrid = document.getElementById("packs-grid");
-    const detailsPanel = document.getElementById("details-panel");
-    const packNameTitle = document.getElementById("pack-name");
-    const blooksContainer = document.getElementById("blooks-container");
 
-    // Render packs as cards
     for (const packName in packs) {
       const card = document.createElement("div");
       card.className = "pack-card";
-      card.innerHTML = `<div class="pack-title">${packName}</div>`;
-      card.addEventListener("click", () => openPack(packName));
-      packsGrid.appendChild(card);
-    }
 
-    function openPack(packName) {
-      packNameTitle.innerText = packName;
-      blooksContainer.innerHTML = "";
+      const title = document.createElement("div");
+      title.className = "pack-title";
+      title.innerText = packName;
+
+      const blooksDiv = document.createElement("div");
+      blooksDiv.className = "blooks-container";
+
       packs[packName].forEach(blook => {
         const blookDiv = document.createElement("div");
         blookDiv.className = "blook-item";
         blookDiv.innerText = blook;
-        blooksContainer.appendChild(blookDiv);
+        blooksDiv.appendChild(blookDiv);
       });
-      detailsPanel.style.display = "flex";
-      detailsPanel.scrollIntoView({ behavior: "smooth" });
+
+      card.appendChild(title);
+      card.appendChild(blooksDiv);
+
+      card.addEventListener("click", () => {
+        blooksDiv.style.display = blooksDiv.style.display === "grid" ? "none" : "grid";
+      });
+
+      packsGrid.appendChild(card);
     }
 
     document.getElementById("logout-link").onclick = () => alert("Logged out!");
