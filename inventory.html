@@ -3,22 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Foods | Foodit</title>
+  <title>Quizterra | Inventory</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/png" href="https://i.postimg.cc/DwTNfscc/foodit-Logo.png" />
-  
+
   <style>
     body {
       margin: 0;
       font-family: Poppins, sans-serif;
-      display: flex;
-      min-height: 100vh;
       background: linear-gradient(120deg, #47a7ff, #745cff, #ff4ef2);
       background-size: 400% 400%;
       animation: gradientMove 12s ease infinite;
       color: white;
-      overflow-x: hidden;
+      display: flex;
+      min-height: 100vh;
     }
 
     @keyframes gradientMove {
@@ -27,61 +25,71 @@
       100% { background-position: 0% 50%; }
     }
 
+    /* SIDEBAR */
     .sidebar {
-      width: 260px;
+      width: 220px;
       background: #002b6f;
-      padding: 25px;
-      height: 100vh;
+      padding: 20px;
+      min-height: 100vh;
       box-shadow: 2px 0 10px rgba(0,0,0,0.4);
-      position: fixed;
-      top: 0;
-      left: 0;
-      transition: transform 0.3s ease;
-      z-index: 10000;
+      font-family: 'Titan One', cursive;
+      display: flex;
+      flex-direction: column;
     }
-    .sidebar.hide { transform: translateX(-280px); }
-    .sidebar .logo { font-family: 'Titan One', cursive; font-size: 40px; margin-bottom: 35px; color: #0fa6ff; font-weight: 900; }
-    .sidebar a { display: flex; align-items: center; gap: 14px; text-decoration: none; color: white; font-size: 22px; font-weight: 700; padding: 12px 15px; border-radius: 12px; margin-bottom: 18px; transition: 0.25s; cursor: pointer; }
-    .sidebar a i { font-size: 24px; }
+
+    .sidebar .logo {
+      font-size: 36px;
+      color: #0fa6ff;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: white;
+      font-size: 20px;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .sidebar a i { font-size: 20px; }
     .sidebar a:hover { background: rgba(255,255,255,0.15); }
     .sidebar a.active { background: rgba(255,255,255,0.2); }
 
+    /* MAIN CONTENT */
     .main {
       flex: 1;
-      margin-left: 260px;
-      padding: 30px 20px;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    /* PACKS & BLOOKS */
+    .pack-section {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+
+    .pack-title {
+      font-family: 'Titan One', cursive;
+      font-size: 22px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid white;
+      padding-bottom: 5px;
+    }
+
+    .blooks-grid {
       display: flex;
-      gap: 30px;
-      transition: margin-left 0.3s ease;
       flex-wrap: wrap;
+      gap: 15px;
     }
-
-    @media (max-width: 768px) {
-      .sidebar { transform: translateX(-280px); position: fixed; }
-      .sidebar.show { transform: translateX(0); }
-      .main { margin-left: 0; padding: 20px 15px; }
-    }
-
-    #hamburger {
-      display: none;
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      font-size: 28px;
-      color: white;
-      background-color: #d96f00;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
-      cursor: pointer;
-      z-index: 10001;
-    }
-
-    @media (max-width: 768px) { #hamburger { display: block; } }
-
-    .pack-section { flex: 1 1 300px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 25px; padding: 20px; margin-bottom: 25px; }
-    .pack-title { font-family: 'Titan One', cursive; font-size: 22px; margin-bottom: 10px; border-bottom: 2px solid white; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-    .blooks-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
 
     .blook-item {
       width: 100px;
@@ -93,64 +101,79 @@
       cursor: pointer;
       transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
     }
+
     .blook-item:hover {
       transform: translateY(-8px) scale(1.05);
       box-shadow: 0 15px 30px rgba(0,0,0,0.4);
       background: rgba(255,255,255,0.3);
     }
-    .blook-item img { width: 80px; height: 80px; object-fit: contain; background: white; border-radius: 15px; margin-bottom: 6px; }
+
+    .blook-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      background: white;
+      border-radius: 15px;
+      margin-bottom: 6px;
+    }
+
     .blook-name { font-family: 'Titan One', cursive; font-size: 14px; color: white; }
-    .rarity { font-size: 12px; font-style: italic; margin-top: 2px; text-transform: capitalize; }
-    .rarity.common { color: #FFFFFF; }
-    .rarity.uncommon { color: #28a745; }
-    .rarity.rare { color: #007bff; }
-    .rarity.epic { color: #dc3545; }
-    .rarity.legendary { color: #fd7e14; }
-    .rarity.chroma { color: #17c3c9; }
-    .rarity.unique { color: #008080; }
-    .rarity.mystical { color: #6f42c1; }
-    .rarity.heavenly { color: #e83e8c; }
 
     .details-panel {
-      flex: 1 1 300px;
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(12px);
       border-radius: 25px;
       padding: 30px;
+      margin-top: 20px;
       display: none;
       flex-direction: column;
       align-items: center;
-      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
     }
+
     .details-panel img { width: 160px; height: 160px; object-fit: contain; border-radius: 20px; margin-bottom: 15px; }
     .details-name { font-size: 26px; font-family: 'Titan One', cursive; margin-bottom: 15px; }
-    .sell-button { background: linear-gradient(135deg, #6a5acd, #00bfff); border: none; color: white; font-family: 'Titan One', cursive; font-size: 18px; padding: 12px 30px; border-radius: 15px; cursor: pointer; margin: 10px 0; transition: all 0.3s ease; }
+    .sell-button {
+      background: linear-gradient(135deg, #6a5acd, #00bfff);
+      border: none;
+      color: white;
+      font-family: 'Titan One', cursive;
+      font-size: 18px;
+      padding: 12px 30px;
+      border-radius: 15px;
+      cursor: pointer;
+      margin: 10px 0;
+      transition: all 0.3s ease;
+    }
     .sell-button:hover { transform: scale(1.08); box-shadow: 0 15px 25px rgba(0,0,0,0.4); }
     .set-profile-button { background: #28a745; }
-    #sell-qty { font-size: 16px; padding: 8px; width: 120px; margin-bottom: 10px; border-radius: 6px; border: none; text-align: center; }
-    .token-limit { margin-top: -5px; font-size: 14px; color: #ffcc99; }
+
+    @media(max-width: 768px) {
+      .sidebar { width: 180px; }
+      .main { padding: 20px; }
+      .blooks-grid { justify-content: center; }
+    }
   </style>
 </head>
 <body>
-  <button id="hamburger"><i class="fas fa-bars"></i></button>
-
-  <div class="sidebar" id="sidebar">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
     <div class="logo">FOODIT</div>
-    <a href="stats.html"><i class="fas fa-chart-line"></i> Stats</a>
-    <a href="market.html"><i class="fas fa-store"></i> Market</a>
-    <a href="foods.html" class="active"><i class="fas fa-utensils"></i> Foods</a>
-    <a href="chat.html"><i class="fas fa-comment"></i> Chat</a>
-    <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+    <a href="#"><i class="fas fa-chart-line"></i> Stats</a>
+    <a href="#"><i class="fas fa-store"></i> Market</a>
+    <a href="#" class="active"><i class="fas fa-utensils"></i> Foods</a>
+    <a href="#"><i class="fas fa-comment"></i> Chat</a>
+    <a href="#"><i class="fas fa-cog"></i> Settings</a>
     <a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
 
-  <div class="main" id="main-content">
+  <!-- MAIN CONTENT -->
+  <div class="main">
     <div id="packs-container"></div>
+
     <div class="details-panel" id="details-panel">
       <img id="detail-img" src="" alt="Blook Image" />
       <div class="details-name" id="detail-name"></div>
       <input type="number" id="sell-qty" placeholder="How many to sell" min="1" />
-      <div class="token-limit" id="token-limit-text"></div>
       <button class="sell-button" id="sell-button">Sell</button>
       <button class="sell-button set-profile-button" id="set-profile">Set Profile</button>
       <button class="sell-button" id="list-button">List</button>
@@ -158,86 +181,55 @@
   </div>
 
   <script>
-    const hamburger = document.getElementById("hamburger");
-    const sidebar = document.getElementById("sidebar");
-    hamburger.addEventListener("click", () => sidebar.classList.toggle("show"));
-
-    let user = JSON.parse(localStorage.getItem("fooditUser"));
-    if (!user) window.location.href = "login.html";
+    const packs = {
+      "Milk Pack": ["Banana Milk","Strawberry Milk","Blueberry Milk","Grape Milk","Chocolate Milk","Warriet Milk","Bubble Gum Milk","Cotton Candy Milk","Cat Milk","Dog Milk","Pumpkin Spice Milk","Space Milk"],
+      "Space Pack": ["Moon","Black Hole","Asteroid","Mars","Saturn","Sun","Space Globe","Astronaut","Meteoroids","Alien Egg","Stary Bot","Alien Capsule","Rainbow Saturn","Spaceship","Constellation"],
+      "School Pack": ["Pencil","Pencil Pouch","Notebook Paper","Note Pad","Markers","Crayons","Chalkboard","Teachers Cup","Teachers Desk","Wise Cat"],
+      "OG Pack": ["History Penguin","Bagel Penguin","Chip","Noodles","Octayden","Ayden","Mystical","Fasty Jay","Spork","Panda Flame","Caterpillar9","SpeedGoodAlr","Allonme","Glitch","SuperMemes64","SOUNDGOD","PrimeAndrew","Blooket Warrior", "GhostRider"],
+      "Donut Pack": ["Glaze Donut","Strawberry Glazed Donut","Chocolate Glazed Donut","Blueberry Donut","Blackberry Donut","Boston Creme","Donut Hole","Space Donut","Cinnamon Rolls","Iced Blue Donut","Mystery Donut"],
+      "Food Pack": ["Pizza","Pineapple","Popsicle","French Pancakes","Cookie","Breakfast Sandwich","Chocolate Bar","Chef"],
+      "Spooky Pack": ["Devil Milk","Mummy Monster","Carmel Ghost","Pumpkin Cat","Pumpkin Pie","Devil Narwhal","Witch Pot","Bot Ghost","Vampire Baby Shark","Black Cat","Zombie Astronaut","Haunted Jack o Lantern","Spooky Bot Ghost", "Sheriff Blooket Warrior", "Caramel Ghost"],
+      "Thanksgiving Pack": ["Leaf Pile","Cornucopia","Pumpkins","Squash","Apple Pie","Pilgram Hat","Turkey Leg","Golden Pumpkin Pie"],
+      "Blizzard Pack": ["Cool Santa","Holiday Cat","Holiday Frog","Santa Gummy","Golden Hot Chocolate","Blooket Christmas Snow Globe","Evil Snowman","Santa Bot","Frozen Crab","Frozen Deer","Frozen Monster","Frozen Owl","Frozen Shark","Golden Wreath","Desert Snow Globe","Turtle Clause"]
+    };
 
     const packsContainer = document.getElementById("packs-container");
     const detailsPanel = document.getElementById("details-panel");
-    const detailImg = document.getElementById("detail-img");
     const detailName = document.getElementById("detail-name");
-    const sellQty = document.getElementById("sell-qty");
-    const tokenLimitText = document.getElementById("token-limit-text");
-    const sellButton = document.getElementById("sell-button");
-    const setProfileButton = document.getElementById("set-profile");
-    const listButton = document.getElementById("list-button");
-
-    const packs = user.packs || {}; // structure: {packName: {blookName: {img, amount, rarity, sellValue, unlocked}}}
 
     function renderPacks() {
       packsContainer.innerHTML = "";
       for (const packName in packs) {
-        const pack = packs[packName];
-        let unlocked = Object.values(pack).filter(b => b.unlocked).length;
         const section = document.createElement("div");
         section.className = "pack-section";
 
         const title = document.createElement("div");
         title.className = "pack-title";
-        title.innerText = `${packName} - Unlocked: ${unlocked}`;
+        title.innerText = packName;
         section.appendChild(title);
 
         const grid = document.createElement("div");
         grid.className = "blooks-grid";
 
-        for (const blookName in pack) {
-          const blook = pack[blookName];
+        packs[packName].forEach(blookName => {
           const div = document.createElement("div");
           div.className = "blook-item";
-          div.innerHTML = `<img src="${blook.img}" alt="${blookName}" /><div class="blook-name">${blookName}</div><div class="rarity ${blook.rarity}">${blook.rarity}</div>`;
-          div.addEventListener("click", () => openDetails(packName, blookName));
+          div.innerHTML = `<div class="blook-name">${blookName}</div>`;
+          div.addEventListener("click", () => openDetails(blookName));
           grid.appendChild(div);
-        }
+        });
+
         section.appendChild(grid);
         packsContainer.appendChild(section);
       }
     }
 
-    function openDetails(packName, blookName) {
-      const blook = packs[packName][blookName];
-      detailImg.src = blook.img;
+    function openDetails(blookName) {
       detailName.innerText = blookName;
-      tokenLimitText.innerText = `You have ${blook.amount}`;
-      sellQty.value = "";
       detailsPanel.style.display = "flex";
-
-      sellButton.onclick = () => {
-        const qty = parseInt(sellQty.value);
-        if (!qty || qty <= 0 || qty > blook.amount) return alert("Invalid amount");
-        blook.amount -= qty;
-        user.tokens = (user.tokens || 0) + qty * blook.sellValue;
-        localStorage.setItem("fooditUser", JSON.stringify(user));
-        tokenLimitText.innerText = `You have ${blook.amount}`;
-        renderPacks();
-        alert(`Sold ${qty} ${blookName} for ${qty * blook.sellValue} tokens`);
-      };
-
-      setProfileButton.onclick = () => {
-        user.profileBlook = blookName;
-        localStorage.setItem("fooditUser", JSON.stringify(user));
-        alert(`${blookName} set as profile Blook!`);
-      };
-
-      listButton.onclick = () => alert(`${blookName} listed in marketplace (placeholder)`);
     }
 
-    document.getElementById("logout-link").onclick = () => {
-      localStorage.removeItem("fooditUser");
-      window.location.href = "login.html";
-    };
+    document.getElementById("logout-link").onclick = () => alert("Logged out! (implement logout logic)");
 
     renderPacks();
   </script>
