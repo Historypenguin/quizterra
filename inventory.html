@@ -1,132 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Packs | Foodit</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Packs | Foodit</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: Poppins, sans-serif;
+    background: linear-gradient(120deg, #47a7ff, #745cff, #ff4ef2);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+    color: white;
+    display: flex;
+    min-height: 100vh;
+  }
+  @keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Poppins, sans-serif;
-      background: linear-gradient(120deg, #47a7ff, #745cff, #ff4ef2);
-      background-size: 400% 400%;
-      animation: gradientMove 12s ease infinite;
-      color: white;
-      display: flex;
-      min-height: 100vh;
-    }
+  /* Sidebar */
+  .sidebar {
+    width: 220px;
+    background: #002b6f;
+    padding: 20px;
+    min-height: 100vh;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+    font-family: 'Titan One', cursive;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar .logo {
+    font-size: 36px;
+    color: #0fa6ff;
+    margin-bottom: 30px;
+    font-weight: bold;
+  }
+  .sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: white;
+    font-size: 20px;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background 0.3s;
+  }
+  .sidebar a i { font-size: 20px; }
+  .sidebar a:hover { background: rgba(255,255,255,0.15); }
+  .sidebar a.active { background: rgba(255,255,255,0.2); }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+  /* Main content */
+  .main {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+  }
 
-    /* SIDEBAR */
-    .sidebar {
-      width: 220px;
-      background: #002b6f;
-      padding: 20px;
-      min-height: 100vh;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.4);
-      font-family: 'Titan One', cursive;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar .logo {
-      font-size: 36px;
-      color: #0fa6ff;
-      margin-bottom: 30px;
-      font-weight: bold;
-    }
-
-    .sidebar a {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: white;
-      font-size: 20px;
-      margin-bottom: 15px;
-      padding: 10px;
-      border-radius: 8px;
-      transition: background 0.3s;
-    }
-
-    .sidebar a i { font-size: 20px; }
-    .sidebar a:hover { background: rgba(255,255,255,0.15); }
-    .sidebar a.active { background: rgba(255,255,255,0.2); }
-
-    /* MAIN CONTENT */
-    .main {
-      flex: 1;
-      padding: 30px;
-      overflow-y: auto;
-    }
-
-    /* PACKS GRID */
-    .packs-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 20px;
-    }
-
-    .pack-card {
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      border-radius: 25px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .pack-card:hover {
-      transform: translateY(-5px) scale(1.03);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-    }
-
-    .pack-title {
-      font-family: 'Titan One', cursive;
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-
-    /* EXPANDABLE BLOOKS */
-    .blooks-container {
-      display: none;
-      margin-top: 15px;
-      gap: 10px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    }
-
-    .blook-item {
-      background: rgba(255,255,255,0.2);
-      padding: 10px;
-      border-radius: 15px;
-      text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
-      font-size: 14px;
-    }
-
-    .blook-item:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-    }
-
-    @media(max-width: 768px) {
-      .sidebar { width: 180px; }
-      .main { padding: 20px; }
-    }
-  </style>
+  /* Pack section */
+  .pack-section {
+    margin-bottom: 40px;
+  }
+  .pack-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: orange;
+    margin-bottom: 10px;
+    border-bottom: 2px solid white;
+    padding-bottom: 5px;
+  }
+  .pack-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+  }
+  .blook-card {
+    width: 100px;
+    height: 100px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .blook-card:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+  }
+</style>
 </head>
 <body>
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="logo">FOODIT</div>
     <a href="#"><i class="fas fa-chart-line"></i> Stats</a>
@@ -137,9 +110,8 @@
     <a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <div class="main">
-    <div class="packs-grid" id="packs-grid"></div>
+  <div class="main" id="packs-container">
+    <!-- Packs will be inserted here -->
   </div>
 
   <script>
@@ -155,34 +127,31 @@
       "Blizzard Pack": ["Cool Santa","Holiday Cat","Holiday Frog","Santa Gummy","Golden Hot Chocolate","Blooket Christmas Snow Globe","Evil Snowman","Santa Bot","Frozen Crab","Frozen Deer","Frozen Monster","Frozen Owl","Frozen Shark","Golden Wreath","Desert Snow Globe","Turtle Clause"]
     };
 
-    const packsGrid = document.getElementById("packs-grid");
+    const container = document.getElementById("packs-container");
 
     for (const packName in packs) {
-      const card = document.createElement("div");
-      card.className = "pack-card";
+      const section = document.createElement("div");
+      section.className = "pack-section";
 
       const title = document.createElement("div");
       title.className = "pack-title";
       title.innerText = packName;
+      section.appendChild(title);
 
-      const blooksDiv = document.createElement("div");
-      blooksDiv.className = "blooks-container";
+      const cardsContainer = document.createElement("div");
+      cardsContainer.className = "pack-cards";
 
+      // Add Blook cards (empty placeholders)
       packs[packName].forEach(blook => {
-        const blookDiv = document.createElement("div");
-        blookDiv.className = "blook-item";
-        blookDiv.innerText = blook;
-        blooksDiv.appendChild(blookDiv);
+        const card = document.createElement("div");
+        card.className = "blook-card";
+        // Placeholder text can be blank or pack initials
+        card.innerText = "";
+        cardsContainer.appendChild(card);
       });
 
-      card.appendChild(title);
-      card.appendChild(blooksDiv);
-
-      card.addEventListener("click", () => {
-        blooksDiv.style.display = blooksDiv.style.display === "grid" ? "none" : "grid";
-      });
-
-      packsGrid.appendChild(card);
+      section.appendChild(cardsContainer);
+      container.appendChild(section);
     }
 
     document.getElementById("logout-link").onclick = () => alert("Logged out!");
