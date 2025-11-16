@@ -2,233 +2,285 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Foodit | Dashboard</title>
+  <title>Quizterra | Stats</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- FONT AWESOME -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
     body {
       margin: 0;
-      font-family: 'Poppins', sans-serif;
+      font-family: Poppins, sans-serif;
       display: flex;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #6a5acd, #00bfff);
+      height: 100vh;
+      background: linear-gradient(120deg, #47a7ff, #745cff, #ff4ef2);
+      background-size: 400% 400%;
+      animation: gradientMove 11s ease infinite;
       color: white;
     }
 
-    /* Sidebar CSS */
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* SIDEBAR */
     .sidebar {
-      width: 250px;
-      background: rgba(0,0,0,0.3);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      width: 260px;
+      background: #002b6f;
+      padding: 25px;
+      height: 100vh;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.4);
     }
 
     .sidebar h2 {
-      margin: 0 0 20px 0;
-      font-size: 1.8rem;
-      text-align: center;
+      font-size: 40px;
+      margin-bottom: 35px;
+      color: #0fa6ff;
+      font-weight: 900;
+      letter-spacing: 1px;
     }
 
-    .sidebar button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      background: rgba(255,255,255,0.2);
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
       color: white;
+      font-size: 22px;
+      font-weight: 700;
+      padding: 12px 15px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      transition: 0.25s;
+      cursor: pointer;
     }
 
-    .sidebar button:hover:not(:disabled) {
-      background: rgba(255,255,255,0.4);
+    .sidebar a i {
+      font-size: 24px;
     }
 
-    .sidebar button:disabled {
-      background: rgba(255,255,255,0.1);
-      cursor: not-allowed;
+    .sidebar a:hover {
+      background: rgba(255,255,255,0.15);
     }
 
-    /* Main content */
-    .main-content {
+    .sidebar a.active {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* MAIN */
+    .main {
       flex: 1;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      padding: 50px;
     }
 
-    .profile {
+    .user-info {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 20px;
       margin-bottom: 20px;
     }
 
-    .profile img {
-      width: 60px;
-      height: 60px;
+    .user-info img {
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       border: 2px solid white;
     }
 
-    .stats {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
+    .user-info h2 {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    /* Daily Claim Button */
+    #claimBtn {
+      background: linear-gradient(135deg, #6a5acd, #00bfff);
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
       margin-bottom: 30px;
+      transition: all 0.3s ease;
     }
 
-    .stat-box {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 12px;
-      width: 120px;
+    #claimBtn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+
+    #claimBtn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      padding: 22px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
       text-align: center;
-      font-weight: 600;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
     }
 
-    .stat-box h2 {
-      margin: 0;
-      font-size: 1.5rem;
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+    }
+
+    .card h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .stat {
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    @media(max-width: 1000px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(max-width: 650px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
+
 <body>
+  <!-- SIDEBAR -->
   <div class="sidebar">
-    <h2>Foodit</h2>
-    <button id="claimTokensBtn">Claim Tokens</button>
-    <button id="logoutBtn">Logout</button>
+    <h2>QUIZTERRA</h2>
+    <a href="stats.html" class="active"><i class="fas fa-chart-line"></i> Stats</a>
+    <a href="market.html"><i class="fas fa-store"></i> Market</a>
+    <a href="quizzes.html"><i class="fas fa-box"></i> Quizzes</a>
+    <a href="sets.html"><i class="fas fa-layer-group"></i> Sets</a>
+    <a id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
 
-  <div class="main-content">
-    <div class="profile">
+  <!-- MAIN -->
+  <div class="main">
+    <div class="user-info">
       <img id="profilePic" src="" alt="Profile Picture">
-      <span id="username">USERNAME</span>
+      <h2 id="username">USERNAME</h2>
     </div>
 
-    <div class="stats">
-      <div class="stat-box">
-        <div>Level</div>
-        <h2 id="level">0</h2>
-      </div>
-      <div class="stat-box">
-        <div>XP</div>
-        <h2 id="xp">0</h2>
-      </div>
-      <div class="stat-box">
-        <div>Tokens</div>
-        <h2 id="coins">0</h2>
-      </div>
-      <div class="stat-box">
-        <div>Games Played</div>
-        <h2 id="gamesPlayed">0</h2>
-      </div>
-      <div class="stat-box">
-        <div>Correct</div>
-        <h2 id="correct">0</h2>
-      </div>
-      <div class="stat-box">
-        <div>Wrong</div>
-        <h2 id="wrong">0</h2>
-      </div>
+    <!-- Daily Token Claim -->
+    <button id="claimBtn">Claim 1000 Tokens</button>
+
+    <div class="stats-grid">
+      <div class="card"><h3>Level</h3><div class="stat" id="level">0</div></div>
+      <div class="card"><h3>XP</h3><div class="stat" id="xp">0</div></div>
+      <div class="card"><h3>Coins</h3><div class="stat" id="coins">0</div></div>
+      <div class="card"><h3>Games Played</h3><div class="stat" id="gamesPlayed">0</div></div>
+      <div class="card"><h3>Correct Answers</h3><div class="stat" id="correct">0</div></div>
+      <div class="card"><h3>Wrong Answers</h3><div class="stat" id="wrong">0</div></div>
     </div>
   </div>
 
   <script>
-    // Initialize or load user data
-    if (!localStorage.getItem("fooditUser")) {
-      localStorage.setItem("fooditUser", JSON.stringify({
-        username: "Player1",
-        picture: "https://i.postimg.cc/3x3QzSGq/profile.png",
-        stats: {
-          level: 1,
-          xp: 50,
-          coins: 0,
-          gamesPlayed: 0,
-          correct: 0,
-          wrong: 0,
-          lastClaim: null
-        }
-      }));
-    }
+    window.onload = () => {
+      let user = JSON.parse(localStorage.getItem("quizterraUser"));
 
-    const user = JSON.parse(localStorage.getItem("fooditUser"));
-    const stats = user.stats;
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
 
-    document.getElementById("username").innerText = user.username;
-    document.getElementById("profilePic").src = user.picture;
+      document.getElementById("username").innerText = user.username || "UNKNOWN";
+      document.getElementById("profilePic").src = user.picture || "";
 
-    function countUp(element, end) {
-      let start = 0;
-      const step = Math.ceil(end / 30);
-      const interval = setInterval(() => {
-        start += step;
-        if (start >= end) {
-          element.innerText = end;
-          clearInterval(interval);
-        } else {
-          element.innerText = start;
-        }
-      }, 20);
-    }
+      if (!user.stats) {
+        user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0, lastClaim:null };
+        localStorage.setItem("quizterraUser", JSON.stringify(user));
+      }
 
-    countUp(document.getElementById("level"), stats.level);
-    countUp(document.getElementById("xp"), stats.xp);
-    countUp(document.getElementById("coins"), stats.coins);
-    countUp(document.getElementById("gamesPlayed"), stats.gamesPlayed);
-    countUp(document.getElementById("correct"), stats.correct);
-    countUp(document.getElementById("wrong"), stats.wrong);
+      const stats = user.stats;
 
-    const claimBtn = document.getElementById("claimTokensBtn");
+      function countUp(element, end) {
+        let start = 0;
+        const step = Math.ceil(end / 30);
+        const interval = setInterval(() => {
+          start += step;
+          if (start >= end) {
+            element.innerText = end;
+            clearInterval(interval);
+          } else {
+            element.innerText = start;
+          }
+        }, 20);
+      }
 
-    function updateClaimButton() {
-      if (stats.lastClaim) {
-        const now = new Date().getTime();
-        const timePassed = now - stats.lastClaim;
-        if (timePassed < 24*60*60*1000) {
-          claimBtn.disabled = true;
-          const remaining = 24*60*60*1000 - timePassed;
+      countUp(document.getElementById("level"), stats.level);
+      countUp(document.getElementById("xp"), stats.xp);
+      countUp(document.getElementById("coins"), stats.coins);
+      countUp(document.getElementById("gamesPlayed"), stats.gamesPlayed);
+      countUp(document.getElementById("correct"), stats.correct);
+      countUp(document.getElementById("wrong"), stats.wrong);
 
-          const hours = Math.floor(remaining / (1000*60*60));
-          const minutes = Math.floor((remaining % (1000*60*60)) / (1000*60));
-          const seconds = Math.floor((remaining % (1000*60)) / 1000);
+      // DAILY CLAIM LOGIC
+      const claimBtn = document.getElementById("claimBtn");
 
-          claimBtn.innerText = `Claim in ${hours}h ${minutes}m ${seconds}s`;
-
-          setTimeout(updateClaimButton, 1000);
+      function updateClaimButton() {
+        if (stats.lastClaim) {
+          const now = Date.now();
+          const elapsed = now - stats.lastClaim;
+          if (elapsed < 24*60*60*1000) {
+            claimBtn.disabled = true;
+            const remaining = 24*60*60*1000 - elapsed;
+            const hours = Math.floor(remaining / (1000*60*60));
+            const minutes = Math.floor((remaining % (1000*60*60)) / (1000*60));
+            const seconds = Math.floor((remaining % (1000*60)) / 1000);
+            claimBtn.innerText = `Claim in ${hours}h ${minutes}m ${seconds}s`;
+            setTimeout(updateClaimButton, 1000);
+          } else {
+            claimBtn.disabled = false;
+            claimBtn.innerText = "Claim 1000 Tokens";
+          }
         } else {
           claimBtn.disabled = false;
-          claimBtn.innerText = "Claim Tokens";
+          claimBtn.innerText = "Claim 1000 Tokens";
         }
-      } else {
-        claimBtn.disabled = false;
-        claimBtn.innerText = "Claim Tokens";
       }
-    }
 
-    updateClaimButton();
+      updateClaimButton();
 
-    claimBtn.onclick = () => {
-      const now = new Date().getTime();
-      if (!stats.lastClaim || (now - stats.lastClaim) >= 24*60*60*1000) {
-        stats.coins += 1000;
-        stats.lastClaim = now;
-        localStorage.setItem("fooditUser", JSON.stringify(user));
-        document.getElementById("coins").innerText = stats.coins;
-        updateClaimButton();
-        alert("You claimed 1000 tokens! Come back tomorrow for more.");
-      }
-    };
+      claimBtn.onclick = () => {
+        const now = Date.now();
+        if (!stats.lastClaim || (now - stats.lastClaim) >= 24*60*60*1000) {
+          stats.coins += 1000;
+          stats.lastClaim = now;
+          localStorage.setItem("quizterraUser", JSON.stringify(user));
+          document.getElementById("coins").innerText = stats.coins;
+          updateClaimButton();
+          alert("You claimed 1000 tokens! Come back tomorrow for more.");
+        }
+      };
 
-    document.getElementById("logoutBtn").onclick = () => {
-      localStorage.removeItem("fooditUser");
-      location.reload();
+      // LOGOUT
+      document.getElementById("logoutBtn").onclick = () => {
+        localStorage.removeItem("quizterraUser");
+        window.location.href = "login.html";
+      };
     };
   </script>
 </body>
