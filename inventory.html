@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Packs | Foodit</title>
+<title>Quizterra | Inventory</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
 <style>
@@ -92,6 +92,8 @@
     font-size: 14px;
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+    padding: 5px;
   }
   .blook-card:hover {
     transform: translateY(-5px) scale(1.05);
@@ -105,15 +107,16 @@
     <a href="stats.html"><i class="fas fa-chart-line"></i> Stats</a>
     <a href="market.html"><i class="fas fa-store"></i> Market</a>
     <a href="inventory.html" class="active"><i class="fas fa-box"></i> Inventory</a>
-    <a href="stets.htm;" class="><i class="fas fa-layer-group"></ai> Sets</a>
+    <a href="sets.html"><i class="fas fa-layer-group"></i> Sets</a>
     <a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
 
   <div class="main" id="packs-container">
-    <!-- Packs will be inserted here -->
+    <!-- User Blooks will appear here -->
   </div>
 
   <script>
+    // All possible packs
     const packs = {
       "Milk Pack": ["Banana Milk","Strawberry Milk","Blueberry Milk","Grape Milk","Chocolate Milk","Warriet Milk","Bubble Gum Milk","Cotton Candy Milk","Cat Milk","Dog Milk","Pumpkin Spice Milk","Space Milk"],
       "Space Pack": ["Moon","Black Hole","Asteroid","Mars","Saturn","Sun","Space Globe","Astronaut","Meteoroids","Alien Egg","Stary Bot","Alien Capsule","Rainbow Saturn","Spaceship","Constellation"],
@@ -125,6 +128,17 @@
       "Thanksgiving Pack": ["Leaf Pile","Cornucopia","Pumpkins","Squash","Apple Pie","Pilgram Hat","Turkey Leg","Golden Pumpkin Pie"],
       "Blizzard Pack": ["Cool Santa","Holiday Cat","Holiday Frog","Santa Gummy","Golden Hot Chocolate","Blooket Christmas Snow Globe","Evil Snowman","Santa Bot","Frozen Crab","Frozen Deer","Frozen Monster","Frozen Owl","Frozen Shark","Golden Wreath","Desert Snow Globe","Turtle Clause"]
     };
+
+    // Example: Blooks user owns (replace this with your market data)
+    const ownedBlooks = [
+      "Banana Milk",
+      "Pizza",
+      "Asteroid",
+      "Moon",
+      "History Penguin",
+      "Glaze Donut",
+      "Frozen Owl"
+    ];
 
     const container = document.getElementById("packs-container");
 
@@ -140,13 +154,14 @@
       const cardsContainer = document.createElement("div");
       cardsContainer.className = "pack-cards";
 
-      // Add Blook cards (empty placeholders)
+      // Only display owned Blooks
       packs[packName].forEach(blook => {
-        const card = document.createElement("div");
-        card.className = "blook-card";
-        // Placeholder text can be blank or pack initials
-        card.innerText = "";
-        cardsContainer.appendChild(card);
+        if (ownedBlooks.includes(blook)) {
+          const card = document.createElement("div");
+          card.className = "blook-card";
+          card.innerText = blook; // You can replace this with an <img> if you have images
+          cardsContainer.appendChild(card);
+        }
       });
 
       section.appendChild(cardsContainer);
