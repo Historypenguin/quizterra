@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Quizterra | Stats</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
@@ -15,42 +16,54 @@
       animation: gradientMove 11s ease infinite;
       color: white;
     }
+
     @keyframes gradientMove {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
 
-    /* SIDEBAR */
+    /* SIDEBAR — Foodit Style but Dark Blue */
     .sidebar {
       width: 260px;
-      background: rgba(0,0,0,0.25);
-      backdrop-filter: blur(12px);
+      background: #002b6f; /* DARK BLUE */
       padding: 25px;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      height: 100vh;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.4);
     }
+
     .sidebar h2 {
-      font-size: 36px; /* bigger Quizterra */
-      margin-bottom: 20px;
-      font-weight: 700;
+      font-size: 40px;
+      margin-bottom: 35px;
+      color: #0fa6ff; /* Light blue highlight */
+      font-weight: 900;
+      letter-spacing: 1px;
     }
+
     .sidebar a {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
       text-decoration: none;
       color: white;
-      opacity: 0.85;
-      font-size: 18px; /* normal size */
-      margin: 10px 0;
-      transition: 0.2s;
+      font-size: 22px;
+      font-weight: 700;
+      padding: 12px 15px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      transition: 0.25s;
     }
-    .sidebar a span { 
-      font-size: 20px; /* average size for emoji */
+
+    .sidebar a span {
+      font-size: 26px;
     }
-    .sidebar a:hover { 
-      opacity: 1; 
-      transform: translateX(6px); 
+
+    .sidebar a:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .sidebar a.active {
+      background: rgba(255,255,255,0.2);
     }
 
     /* MAIN AREA */
@@ -59,22 +72,27 @@
       padding: 50px;
     }
 
-    /* User info */
+    /* User Info */
     .user-info {
       display: flex;
       align-items: center;
       gap: 20px;
       margin-bottom: 40px;
     }
+
     .user-info img {
       width: 80px;
       height: 80px;
       border-radius: 50%;
       border: 2px solid white;
     }
-    .user-info h2 { font-size: 28px; font-weight: 700; }
 
-    /* Stats cards layout */
+    .user-info h2 {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    /* Stats Grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -90,28 +108,46 @@
       text-align: center;
       transition: transform 0.3s, box-shadow 0.3s;
     }
+
     .card:hover {
       transform: translateY(-5px);
       box-shadow: 0 15px 30px rgba(0,0,0,0.4);
     }
-    .card h3 { font-size: 24px; margin-bottom: 10px; font-weight: 700; }
-    .stat { font-size: 36px; font-weight: 700; }
 
-    @media(max-width: 1000px){
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .card h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      font-weight: 700;
     }
-    @media(max-width: 650px){
-      .stats-grid { grid-template-columns: 1fr; }
+
+    .stat {
+      font-size: 36px;
+      font-weight: 700;
     }
+
+    @media(max-width: 1000px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(max-width: 650px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
   </style>
 </head>
+
 <body>
 
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <h2>Quizterra</h2>
+    <h2>QUIZTERRA</h2>
+
     <a href="index.html"><span>🏠</span> Home</a>
-    <a href="stats.html"><span>📊</span> Stats</a>
+    <a href="stats.html" class="active"><span>📊</span> Stats</a>
     <a href="packs.html"><span>🎒</span> Packs</a>
     <a href="profile.html"><span>👤</span> Profile</a>
   </div>
@@ -133,6 +169,7 @@
     </div>
   </div>
 
+  <!-- SCRIPT -->
   <script>
     window.onload = () => {
       const user = JSON.parse(localStorage.getItem("quizterraUser"));
@@ -142,11 +179,9 @@
         return;
       }
 
-      // Show username and profile picture
       document.getElementById("username").innerText = user.username || "UNKNOWN";
       document.getElementById("profilePic").src = user.picture || "";
 
-      // Initialize stats if missing
       if (!user.stats) {
         user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0 };
         localStorage.setItem("quizterraUser", JSON.stringify(user));
@@ -159,8 +194,12 @@
         let step = Math.ceil(end / 30);
         const interval = setInterval(() => {
           start += step;
-          if (start >= end) { element.innerText = end; clearInterval(interval); }
-          else element.innerText = start;
+          if (start >= end) {
+            element.innerText = end;
+            clearInterval(interval);
+          } else {
+            element.innerText = start;
+          }
         }, 20);
       }
 
