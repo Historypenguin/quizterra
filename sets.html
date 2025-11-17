@@ -43,14 +43,12 @@
     <a href="sets.html" class="active"><i class="fas fa-layer-group"></i> Sets</a>
     <a id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
-
   <div class="main">
     <div class="top-row">
       <h1>My Sets</h1>
       <button class="create-btn" onclick="toggleCreateForm()">+ Create Set</button>
     </div>
 
-    <!-- AI Question Generator -->
     <div class="ai-generator">
       <h2>AI Question Generator</h2>
       <input type="text" id="aiTopic" placeholder="Enter topic (e.g., Math, History)">
@@ -59,7 +57,6 @@
       <div id="aiGeneratedQuestions"></div>
     </div>
 
-    <!-- Create Set Form -->
     <div id="createSetForm">
       <h2>Create New Set</h2>
       <input type="text" id="setName" placeholder="Set Name" />
@@ -74,7 +71,6 @@
 <script>
 let user = JSON.parse(localStorage.getItem("quizterraUser"));
 if (!user) window.location = "login.html";
-
 let sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
 
 function loadSets() {
@@ -82,7 +78,6 @@ function loadSets() {
   container.innerHTML = "";
   const mySets = sets.filter(s => s.owner === user.username);
   if(mySets.length===0){ container.innerHTML="<h2>You have no sets. Create one!</h2>"; return; }
-
   mySets.forEach(set => {
     container.innerHTML += `
       <div class="set-card">
@@ -122,7 +117,6 @@ function createSet(){
   const name = document.getElementById("setName").value.trim();
   const questionBlocks = document.querySelectorAll('.question-block');
   if(!name || questionBlocks.length===0){ alert('Enter a name and at least 1 question'); return; }
-
   const questions = Array.from(questionBlocks).map(b=>{
     const inputs = b.querySelectorAll('input');
     const select = b.querySelector('select');
@@ -133,11 +127,9 @@ function createSet(){
       correct: parseInt(select.value)
     };
   });
-
   const newSet = {id:Date.now().toString(),name,owner:user.username,questions};
   sets.push(newSet);
   localStorage.setItem('quizterraSets',JSON.stringify(sets));
-
   document.getElementById("setName").value='';
   document.getElementById("questionsContainer").innerHTML='';
   toggleCreateForm();
@@ -150,25 +142,19 @@ function deleteSet(id){ if(confirm('Delete this set?')){ sets=sets.filter(s=>s.i
 document.getElementById('logoutBtn').onclick=()=>{localStorage.removeItem('quizterraUser'); window.location='login.html';};
 loadSets();
 
-// AI Question Generator
 function generateAIQuestions(){
   const topic = document.getElementById('aiTopic').value.trim();
   const count = parseInt(document.getElementById('aiCount').value);
   if(!topic || !count){ alert('Enter topic and number of questions'); return; }
-
-  // For now, simulate AI with placeholder questions
-  const generated=[];
   for(let i=1;i<=count;i++){
-    generated.push({
-      question:`Sample ${topic} Question ${i}`,
+    addQuestionInput({
+      question:`${topic} Question ${i}`,
       image:'',
-      options:[`Option A`,`Option B`,`Option C`,`Option D`],
+      options:[`Option 1`,`Option 2`,`Option 3`,`Option 4`],
       correct:0
     });
   }
-
-  const aiDiv = document.getElementById('aiGeneratedQuestions');
-  aiDiv.innerHTML='';
-  generated.forEach(q=>{ addQuestionInput(q); });
-  aiDiv.innerHTML=`<p>${count} AI questions added to your form above.</p>`;
 }
+</script>
+</body>
+</html>
