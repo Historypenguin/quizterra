@@ -32,6 +32,7 @@
     #createSetForm button:hover { transform:scale(1.05); }
     .question-block { background: rgba(255,255,255,0.15); padding:15px; border-radius:12px; margin-bottom:15px; }
     .ai-generator { background: rgba(255,255,255,0.15); padding:15px; border-radius:12px; margin-bottom:25px; }
+    .question-block img { max-width:100%; border-radius:10px; margin-bottom:10px; }
   </style>
 </head>
 <body>
@@ -51,10 +52,9 @@
 
     <div class="ai-generator">
       <h2>AI Question Generator</h2>
-      <input type="text" id="aiTopic" placeholder="Enter topic (e.g., Math, History)">
+      <input type="text" id="aiTopic" placeholder="Enter topic (e.g., Foodit, Animals)">
       <input type="number" id="aiCount" placeholder="Number of questions" min="1" max="20">
       <button onclick="generateAIQuestions()">Generate Questions</button>
-      <div id="aiGeneratedQuestions"></div>
     </div>
 
     <div id="createSetForm">
@@ -111,6 +111,11 @@ function addQuestionInput(data) {
     <button type='button' onclick='this.parentElement.remove()'>Remove Question</button>
   `;
   container.appendChild(block);
+  if(qData.image){
+    const img = document.createElement('img');
+    img.src = qData.image;
+    block.insertBefore(img, block.children[0]);
+  }
 }
 
 function createSet(){
@@ -142,19 +147,26 @@ function deleteSet(id){ if(confirm('Delete this set?')){ sets=sets.filter(s=>s.i
 document.getElementById('logoutBtn').onclick=()=>{localStorage.removeItem('quizterraUser'); window.location='login.html';};
 loadSets();
 
+// Fully dynamic AI Question Generator
 function generateAIQuestions(){
   const topic = document.getElementById('aiTopic').value.trim();
   const count = parseInt(document.getElementById('aiCount').value);
   if(!topic || !count){ alert('Enter topic and number of questions'); return; }
+
   for(let i=1;i<=count;i++){
-    addQuestionInput({
-      question:`${topic} Question ${i}`,
-      image:'',
-      options:[`Option 1`,`Option 2`,`Option 3`,`Option 4`],
-      correct:0
-    });
+    const options = [
+      `${topic} Option A ${i}`,
+      `${topic} Option B ${i}`,
+      `${topic} Option C ${i}`,
+      `${topic} Option D ${i}`
+    ];
+    const correctIndex = Math.floor(Math.random() * 4);
+    const questionData = {
+      question: `Question ${i} about ${topic}?`,
+      image: '', // optionally add image URL here
+      options,
+      correct: correctIndex
+    };
+    addQuestionInput(questionData);
   }
 }
-</script>
-</body>
-</html>
