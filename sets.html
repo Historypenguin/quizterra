@@ -5,37 +5,160 @@
   <title>Quizterra | My Sets</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
-    body { margin:0; font-family:Poppins,sans-serif; display:flex; height:100vh; background:linear-gradient(120deg,#47a7ff,#745cff,#ff4ef2); background-size:400% 400%; animation:gradientMove 11s ease infinite; color:white;}
-    @keyframes gradientMove { 0% {background-position:0% 50%;} 50% {background-position:100% 50%;} 100% {background-position:0% 50%;} }
-    .sidebar { width:260px; background:#002b6f; padding:25px; height:100vh; box-shadow:2px 0 10px rgba(0,0,0,0.4); }
-    .sidebar h2 { font-size:40px; margin-bottom:35px; color:#0fa6ff; font-weight:900; }
-    .sidebar a { display:flex; align-items:center; gap:14px; color:white; text-decoration:none; font-size:22px; font-weight:700; padding:12px 15px; border-radius:12px; margin-bottom:18px; transition:.25s; }
+    body {
+      margin: 0;
+      font-family: Poppins, sans-serif;
+      display: flex;
+      height: 100vh;
+      background: linear-gradient(120deg, #47a7ff, #745cff, #ff4ef2);
+      background-size: 400% 400%;
+      animation: gradientMove 11s ease infinite;
+      color: white;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .sidebar {
+      width: 260px;
+      background: #002b6f;
+      padding: 25px;
+      height: 100vh;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+    }
+    .sidebar h2 {
+      font-size: 40px;
+      margin-bottom: 35px;
+      color: #0fa6ff;
+      font-weight: 900;
+    }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: white;
+      text-decoration: none;
+      font-size: 22px;
+      font-weight: 700;
+      padding: 12px 15px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      transition: 0.25s;
+    }
     .sidebar a:hover { background: rgba(255,255,255,0.15); }
     .sidebar a.active { background: rgba(255,255,255,0.2); }
-    .main { flex:1; padding:50px; overflow-y:auto; }
-    .top-row { display:flex; justify-content:space-between; align-items:center; }
-    .create-btn { background: rgba(255,255,255,0.25); padding:14px 22px; border:none; border-radius:12px; font-size:20px; font-weight:700; cursor:pointer; color:white; transition:.3s; }
-    .create-btn:hover { background: rgba(255,255,255,0.35); transform:scale(1.05); }
-    .sets-grid { margin-top:30px; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:25px; }
-    .set-card { background: rgba(255,255,255,0.18); padding:20px; border-radius:18px; backdrop-filter: blur(10px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition:.3s; }
-    .set-card h3 { margin:0 0 10px 0; font-size:22px; font-weight:700; }
-    .set-card p { font-size:15px; opacity:.9; }
-    .card-btns { display:flex; gap:10px; margin-top:15px; }
-    .card-btns button { flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; cursor:pointer; font-size:15px; }
-    .edit-btn { background:#00d4ff; }
-    .delete-btn { background:#ff4f4f; color:white; }
-    .play-btn { background:#00ff95; }
-    #createSetForm { display:none; margin-top:30px; background: rgba(255,255,255,0.2); padding:20px; border-radius:18px; backdrop-filter: blur(10px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-    #createSetForm input, #createSetForm textarea, #createSetForm select { width:100%; padding:10px; margin-bottom:15px; border-radius:8px; border:none; font-size:16px; }
-    #createSetForm button { background:#00ff95; border:none; padding:12px 20px; font-size:16px; font-weight:700; border-radius:12px; cursor:pointer; transition:.3s; }
-    #createSetForm button:hover { transform:scale(1.05); }
-    .question-block { background: rgba(255,255,255,0.15); padding:15px; border-radius:12px; margin-bottom:15px; }
-    .ai-generator { background: rgba(255,255,255,0.15); padding:15px; border-radius:12px; margin-bottom:25px; }
-    .question-block img { max-width:100%; border-radius:10px; margin-bottom:10px; }
+
+    .main {
+      flex: 1;
+      padding: 50px;
+      overflow-y: auto;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .create-btn {
+      background: rgba(255,255,255,0.25);
+      padding: 14px 22px;
+      border: none;
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      transition: 0.3s;
+    }
+    .create-btn:hover {
+      background: rgba(255,255,255,0.35);
+      transform: scale(1.05);
+    }
+
+    .sets-grid {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    .set-card {
+      background: rgba(255,255,255,0.18);
+      padding: 20px;
+      border-radius: 18px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      transition: 0.3s;
+    }
+    .set-card h3 {
+      margin: 0 0 10px 0;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .set-card p {
+      font-size: 15px;
+      opacity: .9;
+    }
+
+    .card-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .card-btns button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .edit-btn { background: #00d4ff; }
+    .delete-btn { background: #ff4f4f; color: white; }
+    .play-btn { background: #00ff95; }
+
+    /* Create Set Form */
+    #createSetForm {
+      display: none;
+      margin-top: 30px;
+      background: rgba(255,255,255,0.2);
+      padding: 20px;
+      border-radius: 18px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    #createSetForm input, #createSetForm textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    #createSetForm button {
+      background: #00ff95;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #createSetForm button:hover {
+      transform: scale(1.05);
+    }
   </style>
 </head>
+
 <body>
+
   <div class="sidebar">
     <h2>QUIZTERRA</h2>
     <a href="stats.html"><i class="fas fa-chart-line"></i> Stats</a>
@@ -44,129 +167,110 @@
     <a href="sets.html" class="active"><i class="fas fa-layer-group"></i> Sets</a>
     <a id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
+
   <div class="main">
     <div class="top-row">
       <h1>My Sets</h1>
       <button class="create-btn" onclick="toggleCreateForm()">+ Create Set</button>
     </div>
 
-    <div class="ai-generator">
-      <h2>AI Question Generator</h2>
-      <input type="text" id="aiTopic" placeholder="Enter topic (e.g., Foodit, Animals)">
-      <input type="number" id="aiCount" placeholder="Number of questions" min="1" max="20">
-      <button onclick="generateAIQuestions()">Generate Questions</button>
-    </div>
-
+    <!-- Create Set Form -->
     <div id="createSetForm">
       <h2>Create New Set</h2>
       <input type="text" id="setName" placeholder="Set Name" />
-      <div id="questionsContainer"></div>
-      <button onclick="addQuestionInput()">+ Add Question</button>
+      <textarea id="setQuestions" placeholder="Enter questions separated by line breaks"></textarea>
       <button onclick="createSet()">Save Set</button>
     </div>
 
     <div class="sets-grid" id="setsGrid"></div>
   </div>
 
-<script>
-let user = JSON.parse(localStorage.getItem("quizterraUser"));
-if (!user) window.location = "login.html";
-let sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
+  <script>
+    let user = JSON.parse(localStorage.getItem("quizterraUser"));
+    if (!user) window.location = "login.html";
 
-function loadSets() {
-  const container = document.getElementById("setsGrid");
-  container.innerHTML = "";
-  const mySets = sets.filter(s => s.owner === user.username);
-  if(mySets.length===0){ container.innerHTML="<h2>You have no sets. Create one!</h2>"; return; }
-  mySets.forEach(set => {
-    container.innerHTML += `
-      <div class="set-card">
-        <h3>${set.name}</h3>
-        <p>${set.questions.length} Questions</p>
-        <div class="card-btns">
-          <button class="edit-btn" onclick="editSet('${set.id}')">Edit</button>
-          <button class="delete-btn" onclick="deleteSet('${set.id}')">Delete</button>
-          <button class="play-btn" onclick="playSet('${set.id}')">Play</button>
-        </div>
-      </div>
-    `;
-  });
-}
+    let sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
 
-function toggleCreateForm(){
-  const form = document.getElementById("createSetForm");
-  form.style.display = form.style.display==='none'?'block':'none';
-}
+    function loadSets() {
+      const container = document.getElementById("setsGrid");
+      container.innerHTML = "";
 
-function addQuestionInput(data) {
-  const container = document.getElementById("questionsContainer");
-  const qData = data || {question:'',image:'',options:['','','',''],correct:0};
-  const block = document.createElement('div');
-  block.className='question-block';
-  block.innerHTML = `
-    <input type='text' placeholder='Question' value='${qData.question}'>
-    <input type='text' placeholder='Image/GIF URL (optional)' value='${qData.image}'>
-    ${qData.options.map((opt,i)=>`<input type='text' placeholder='Option ${i+1}' value='${opt}'>`).join('')}
-    <select>${qData.options.map((_,i)=>`<option value='${i}' ${i===qData.correct?'selected':''}>Correct Answer ${i+1}</option>`).join('')}</select>
-    <button type='button' onclick='this.parentElement.remove()'>Remove Question</button>
-  `;
-  container.appendChild(block);
-  if(qData.image){
-    const img = document.createElement('img');
-    img.src = qData.image;
-    block.insertBefore(img, block.children[0]);
-  }
-}
+      const mySets = sets.filter(s => s.owner === user.username);
 
-function createSet(){
-  const name = document.getElementById("setName").value.trim();
-  const questionBlocks = document.querySelectorAll('.question-block');
-  if(!name || questionBlocks.length===0){ alert('Enter a name and at least 1 question'); return; }
-  const questions = Array.from(questionBlocks).map(b=>{
-    const inputs = b.querySelectorAll('input');
-    const select = b.querySelector('select');
-    return {
-      question: inputs[0].value.trim(),
-      image: inputs[1].value.trim(),
-      options: [inputs[2].value,inputs[3].value,inputs[4].value,inputs[5].value].map(v=>v.trim()),
-      correct: parseInt(select.value)
+      if (mySets.length === 0) {
+        container.innerHTML = "<h2>You have no sets. Create one!</h2>";
+        return;
+      }
+
+      mySets.forEach(set => {
+        container.innerHTML += `
+          <div class="set-card">
+            <h3>${set.name}</h3>
+            <p>${set.questions.length} Questions</p>
+            <div class="card-btns">
+              <button class="edit-btn" onclick="editSet('${set.id}')">Edit</button>
+              <button class="delete-btn" onclick="deleteSet('${set.id}')">Delete</button>
+              <button class="play-btn" onclick="playSet('${set.id}')">Play</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function toggleCreateForm() {
+      const form = document.getElementById("createSetForm");
+      form.style.display = form.style.display === "none" ? "block" : "none";
+    }
+
+    function createSet() {
+      const name = document.getElementById("setName").value.trim();
+      const questions = document.getElementById("setQuestions").value.trim().split("\n").filter(q => q);
+
+      if (!name || questions.length === 0) {
+        alert("Please enter a name and at least one question.");
+        return;
+      }
+
+      const newSet = {
+        id: Date.now().toString(),
+        name,
+        owner: user.username,
+        questions: questions.map(q => ({ question: q }))
+      };
+
+      sets.push(newSet);
+      localStorage.setItem("quizterraSets", JSON.stringify(sets));
+
+      document.getElementById("setName").value = "";
+      document.getElementById("setQuestions").value = "";
+      toggleCreateForm();
+      loadSets();
+    }
+
+    function editSet(id) {
+      localStorage.setItem("editingSet", id);
+      window.location = "create-set.html";
+    }
+
+    function playSet(id) {
+      alert("Game mode not made yet — but set loads correctly!");
+    }
+
+    function deleteSet(id) {
+      if (confirm("Delete this set?")) {
+        sets = sets.filter(s => s.id != id);
+        localStorage.setItem("quizterraSets", JSON.stringify(sets));
+        loadSets();
+      }
+    }
+
+    document.getElementById("logoutBtn").onclick = () => {
+      localStorage.removeItem("quizterraUser");
+      window.location = "login.html";
     };
-  });
-  const newSet = {id:Date.now().toString(),name,owner:user.username,questions};
-  sets.push(newSet);
-  localStorage.setItem('quizterraSets',JSON.stringify(sets));
-  document.getElementById("setName").value='';
-  document.getElementById("questionsContainer").innerHTML='';
-  toggleCreateForm();
-  loadSets();
-}
 
-function editSet(id){ localStorage.setItem('editingSet',id); window.location='create-set.html'; }
-function playSet(id){ alert('Game mode not made yet — but set loads correctly!'); }
-function deleteSet(id){ if(confirm('Delete this set?')){ sets=sets.filter(s=>s.id!=id); localStorage.setItem('quizterraSets',JSON.stringify(sets)); loadSets(); } }
-document.getElementById('logoutBtn').onclick=()=>{localStorage.removeItem('quizterraUser'); window.location='login.html';};
-loadSets();
+    loadSets();
+  </script>
 
-// Fully dynamic AI Question Generator
-function generateAIQuestions(){
-  const topic = document.getElementById('aiTopic').value.trim();
-  const count = parseInt(document.getElementById('aiCount').value);
-  if(!topic || !count){ alert('Enter topic and number of questions'); return; }
-
-  for(let i=1;i<=count;i++){
-    const options = [
-      `${topic} Option A ${i}`,
-      `${topic} Option B ${i}`,
-      `${topic} Option C ${i}`,
-      `${topic} Option D ${i}`
-    ];
-    const correctIndex = Math.floor(Math.random() * 4);
-    const questionData = {
-      question: `Question ${i} about ${topic}?`,
-      image: '', // optionally add image URL here
-      options,
-      correct: correctIndex
-    };
-    addQuestionInput(questionData);
-  }
-}
+</body>
+</html>
