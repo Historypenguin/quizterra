@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quizterra | Select Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: Poppins, sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px;
+  }
+
+  .container {
+    display: flex;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  /* Left grid of quizzes */
+  .quiz-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .quiz-card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    text-align: center;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.3s, background 0.3s;
+  }
+
+  .quiz-card:hover {
+    transform: scale(1.05);
+    background: rgba(255,255,255,0.25);
+  }
+
+  .quiz-card img {
+    max-width: 100%;
+    border-radius: 15px;
+  }
+
+  .quiz-card h3 {
+    margin: 10px 0 0 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* Right details panel */
+  .quiz-details {
+    flex: 1;
+    background: rgba(0,0,0,0.3);
+    border-radius: 20px;
+    padding: 20px;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .quiz-details h2 {
+    margin: 0;
+    font-size: 28px;
+    text-align: center;
+  }
+
+  .quiz-description {
+    background: #8e2de2;
+    padding: 10px 15px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .detail-item {
+    background: rgba(255,255,255,0.15);
+    padding: 10px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+  }
+
+  .game-btn {
+    background: #ffb400;
+    color: #000;
+    font-weight: 700;
+    font-size: 20px;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 0;
+    cursor: pointer;
+    margin-top: auto;
+    transition: transform 0.3s, background 0.3s;
+  }
+  .game-btn:hover {
+    transform: scale(1.05);
+    background: #ffc83d;
+  }
+  .game-btn:disabled {
+    background: rgba(255,180,0,0.5);
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Left Quiz Grid -->
+  <div class="quiz-grid" id="quizGrid"></div>
+
+  <!-- Right Details Panel -->
+  <div class="quiz-details" id="quizDetails">
+    <h2>Select a Quiz</h2>
+    <div class="quiz-description" id="quizDesc">Click a quiz to see details!</div>
+    <div class="detail-grid" id="detailItems"></div>
+    <button class="game-btn" id="playBtn" disabled>Play</button>
+    <button class="game-btn" id="studyBtn" disabled>Study</button>
+  </div>
+</div>
+
+<script>
+let user = JSON.parse(localStorage.getItem("quizterraUser"));
+if(!user) window.location = "login.html";
+
+let sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
+const quizGrid = document.getElementById("quizGrid");
+const quizDesc = document.getElementById("quizDesc");
+const detailItems = document.getElementById("detailItems");
+const playBtn = document.getElementById("playBtn");
+const studyBtn = document.getElementById("studyBtn");
+
+let selectedSet = null;
+
+// Example image URLs (replace with your own images)
+const defaultImages = [
+  "https://via.placeholder.com/150x100?text=Fishing+Frenzy",
+  "https://via.placeholder.com/150x100?text=Zorblitz",
+  "https://via.placeholder.com/150x100?text=Pirate+Pool",
+  "https://via.placeholder.com/150x100?text=Plushie+Panic"
+];
+
+// Load quiz cards
+sets.filter(s => s.owner === user.username).forEach((set,i) => {
+  const card = document.createElement("div");
+  card.className = "quiz-card";
+  card.innerHTML = `<img src="${defaultImages[i % defaultImages.length]}" alt="${set.name}">
+                    <h3>${set.name}</h3>`;
+  card.onclick = () => selectSet(set, defaultImages[i % defaultImages.length]);
+  quizGrid.appendChild(card);
+});
+
+function selectSet(set, img) {
+  selectedSet = set;
+  quizDesc.textContent = set.description || "Get ready to test your skills!";
+  detailItems.innerHTML = "";
+
+  const details = [
+    {label: "Difficulty", value: "Simple"},
+    {label: "Skills", value: "Speed & Accuracy"},
+    {label: "Ideal Time", value: `${Math.ceil(set.questions.length * 0.5)} min`},
+    {label: "Questions", value: "High Frequency"}
+  ];
+
+  details.forEach(d => {
+    const div = document.createElement("div");
+    div.className = "detail-item";
+    div.innerHTML = `<span>${d.label}</span><span>${d.value}</span>`;
+    detailItems.appendChild(div);
+  });
+
+  playBtn.disabled = false;
+  studyBtn.disabled = false;
+}
+
+playBtn.onclick = () => {
+  if(selectedSet) window.location = `play.html?setId=${selectedSet.id}`;
+};
+studyBtn.onclick = () => {
+  if(selectedSet) window.location = `study.html?setId=${selectedSet.id}`;
+};
+</script>
+
+</body>
+</html>
