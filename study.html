@@ -247,14 +247,19 @@ function showQuestion(index) {
   }
 
   const colors = ["Red","Orange","Green","Blue"];
-  colors.forEach((color,i)=>{
-    btns[color].disabled = false;
-    btns[color].classList.remove("option-correct","option-wrong");
-    btns[color].textContent = options[i] || "";
-  });
+  colors.forEach((color, i) => {
+    const btn = btns[color];
+    btn.classList.remove("option-correct","option-wrong");
 
-  colors.forEach(color => {
-    btns[color].onclick = () => selectAnswer(btns[color].textContent, q.answer);
+    if(options[i]) {
+      btn.textContent = options[i];
+      btn.disabled = false;
+      btn.onclick = () => selectAnswer(btn.textContent, q.answer);
+    } else {
+      btn.textContent = "";
+      btn.disabled = true;
+      btn.onclick = null;
+    }
   });
 
   questionText.style.fontSize = bigFontCheckbox.checked ? "28px" : "20px";
