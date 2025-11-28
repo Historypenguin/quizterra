@@ -16,7 +16,6 @@ body {
   align-items: flex-start;
   padding: 40px;
 }
-
 .quiz-container {
   background: rgba(0,0,0,0.3);
   border-radius: 20px;
@@ -28,31 +27,7 @@ body {
   gap: 20px;
   position: relative;
 }
-
-.top-icons {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  display: flex;
-  gap: 15px;
-  z-index: 2;
-}
-
-.icon-btn {
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  font-size: 20px;
-  padding: 8px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.icon-btn:hover { background: rgba(255,255,255,0.4); }
-
 h2 { text-align: center; font-size: 28px; margin: 0; }
-
 .question-box {
   background: rgba(255,255,255,0.1);
   padding: 20px;
@@ -64,16 +39,13 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   align-items: center;
   gap: 10px;
 }
-
 .question-box img { max-width: 100%; border-radius: 12px; display: none; }
-
 .options-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
   margin-top: 10px;
 }
-
 .option-btn {
   padding: 20px;
   border-radius: 15px;
@@ -84,17 +56,13 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   color: white;
   transition: transform 0.2s, opacity 0.2s;
 }
-
 .option-btn:hover { transform: scale(1.03); opacity: 0.9; }
-
 .red { background: #e74c3c; }
 .orange { background: #f39c12; }
 .green { background: #27ae60; }
 .blue { background: #2980b9; }
-
 .option-correct { border: 3px solid #28a745 !important; }
 .option-wrong { border: 3px solid #dc3545 !important; }
-
 #nextBtn {
   background: #8e2de2;
   color: white;
@@ -160,8 +128,8 @@ const btns = {
 function showQuestion(index){
   const q = set.questions[index];
   questionText.textContent = q.question;
-  if(q.image){ questionImage.src = q.image; questionImage.style.display="block"; } 
-  else { questionImage.style.display="none"; }
+  if(q.image){ questionImage.src=q.image; questionImage.style.display="block"; }
+  else{ questionImage.style.display="none"; }
 
   nextBtn.disabled = true;
 
@@ -179,17 +147,20 @@ function showQuestion(index){
     if(options[i]){
       btn.textContent = options[i];
       btn.disabled = false;
-      btn.onclick = ()=> selectAnswer(btn.textContent,q.answer);
+      btn.onclick = null; // reset
+      btn.addEventListener('click', function handler(){
+        selectAnswer(options[i], q.answer);
+        btn.removeEventListener('click', handler); // remove to prevent double click
+      });
     } else {
       btn.textContent = "";
       btn.disabled = true;
-      btn.onclick = null;
     }
   });
 }
 
 // --- Select Answer ---
-function selectAnswer(selected,correct){
+function selectAnswer(selected, correct){
   Object.values(btns).forEach(b=>b.disabled=true);
 
   if(!user.stats) user.stats={level:0,xp:0,coins:0,gamesPlayed:0,correct:0,wrong:0,studyWeeks:0};
@@ -209,18 +180,19 @@ function selectAnswer(selected,correct){
     });
     stats.wrong++;
   }
-  localStorage.setItem("quizterraUser",JSON.stringify(user));
-  nextBtn.disabled=false;
+
+  localStorage.setItem("quizterraUser", JSON.stringify(user));
+  nextBtn.disabled = false;
 }
 
 // --- Next Question ---
-nextBtn.onclick=()=>{
+nextBtn.onclick = ()=>{
   currentQuestion++;
-  if(currentQuestion>=set.questions.length){
+  if(currentQuestion >= set.questions.length){
     user.stats.gamesPlayed++;
     user.stats.studyWeeks++;
-    user.stats.level=user.stats.studyWeeks;
-    localStorage.setItem("quizterraUser",JSON.stringify(user));
+    user.stats.level = user.stats.studyWeeks;
+    localStorage.setItem("quizterraUser", JSON.stringify(user));
     alert("You finished studying this set!");
     window.location="stats.html";
   } else showQuestion(currentQuestion);
