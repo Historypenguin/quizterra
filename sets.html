@@ -237,6 +237,21 @@ function toggleCreateForm() {
       : "none";
 }
 
+// --- NEW FUNCTION: Update dropdown options dynamically ---
+function updateCorrectDropdown(block) {
+  const select = block.querySelector(".q-correct");
+  const opts = [
+    block.querySelector(".opt1").value.trim(),
+    block.querySelector(".opt2").value.trim(),
+    block.querySelector(".opt3").value.trim(),
+    block.querySelector(".opt4").value.trim()
+  ];
+
+  select.innerHTML = `<option value="" disabled selected>Select Correct Answer</option>` +
+    opts.map(o => `<option value="${o}">${o || "Untitled Option"}</option>`).join("");
+}
+
+// Add question block
 function addQuestion() {
   const container = document.getElementById("questionsContainer");
 
@@ -249,17 +264,21 @@ function addQuestion() {
       <input type="text" class="opt3" placeholder="Option 3">
       <input type="text" class="opt4" placeholder="Option 4">
       <select class="q-correct">
-        <option value="0">Correct Answer: Option 1</option>
-        <option value="1">Correct Answer: Option 2</option>
-        <option value="2">Correct Answer: Option 3</option>
-        <option value="3">Correct Answer: Option 4</option>
+        <option value="" disabled selected>Select Correct Answer</option>
       </select>
     </div>
   `;
 
   container.insertAdjacentHTML("beforeend", html);
+  const block = container.lastElementChild;
+
+  // Update dropdown whenever options change
+  block.querySelectorAll(".opt1, .opt2, .opt3, .opt4").forEach(input => {
+    input.addEventListener("input", () => updateCorrectDropdown(block));
+  });
 }
 
+// Create set
 function createSet() {
   const name = document.getElementById("setName").value.trim();
   if (!name) return alert("Enter a set name.");
@@ -277,7 +296,7 @@ function createSet() {
         block.querySelector(".opt3").value.trim(),
         block.querySelector(".opt4").value.trim()
       ],
-      correct: Number(block.querySelector(".q-correct").value)
+      correct: block.querySelector(".q-correct").value
     };
   });
 
@@ -295,6 +314,7 @@ function createSet() {
   location.reload();
 }
 
+// Edit set
 function editSet(id) {
   const set = sets.find(s => s.id === id);
   if (!set) return alert("Set not found!");
@@ -314,15 +334,17 @@ function editSet(id) {
         <input type="text" class="opt2" placeholder="Option 2" value="${q.options[1]}">
         <input type="text" class="opt3" placeholder="Option 3" value="${q.options[2]}">
         <input type="text" class="opt4" placeholder="Option 4" value="${q.options[3]}">
-        <select class="q-correct">
-          <option value="0" ${q.correct===0?'selected':''}>Correct Answer: Option 1</option>
-          <option value="1" ${q.correct===1?'selected':''}>Correct Answer: Option 2</option>
-          <option value="2" ${q.correct===2?'selected':''}>Correct Answer: Option 3</option>
-          <option value="3" ${q.correct===3?'selected':''}>Correct Answer: Option 4</option>
-        </select>
+        <select class="q-correct"></select>
       </div>
     `;
     container.insertAdjacentHTML("beforeend", html);
+    const block = container.lastElementChild;
+    updateCorrectDropdown(block);
+    block.querySelector(`.q-correct option[value="${q.correct}"]`)?.setAttribute("selected", "selected");
+
+    block.querySelectorAll(".opt1, .opt2, .opt3, .opt4").forEach(input => {
+      input.addEventListener("input", () => updateCorrectDropdown(block));
+    });
   });
 
   const saveBtn = document.getElementById("saveSetBtn");
@@ -345,7 +367,7 @@ function editSet(id) {
           block.querySelector(".opt3").value.trim(),
           block.querySelector(".opt4").value.trim()
         ],
-        correct: Number(block.querySelector(".q-correct").value)
+        correct: block.querySelector(".q-correct").value
       };
     });
 
