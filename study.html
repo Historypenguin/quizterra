@@ -51,11 +51,7 @@ body {
 
 .icon-btn:hover { background: rgba(255,255,255,0.4); }
 
-h2 {
-  text-align: center;
-  font-size: 28px;
-  margin: 0;
-}
+h2 { text-align: center; font-size: 28px; margin: 0; }
 
 .question-box {
   background: rgba(255,255,255,0.1);
@@ -67,20 +63,15 @@ h2 {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  position: relative; /* NO z-index that blocks buttons */
 }
 
-.question-box img {
-  max-width: 100%;
-  border-radius: 12px;
-  display: none;
-}
+.question-box img { max-width: 100%; border-radius: 12px; display: none; }
 
 .options-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
-  margin-top: 10px; /* ensure spacing below question-box */
+  margin-top: 10px;
 }
 
 .option-btn {
@@ -104,21 +95,6 @@ h2 {
 .option-correct { border: 3px solid #28a745 !important; }
 .option-wrong { border: 3px solid #dc3545 !important; }
 
-.settings-dropdown {
-  display: none;
-  position: absolute;
-  top: 40px;
-  right: 0;
-  background: rgba(0,0,0,0.7);
-  padding: 15px;
-  border-radius: 12px;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 2;
-}
-
-.settings-dropdown label { cursor: pointer; font-size: 16px; }
-
 #nextBtn {
   background: #8e2de2;
   color: white;
@@ -130,7 +106,6 @@ h2 {
   cursor: pointer;
   transition: 0.3s;
 }
-
 #nextBtn:hover { background: #a23bff; }
 #nextBtn:disabled { background: rgba(142,45,226,0.5); cursor: not-allowed; }
 </style>
@@ -138,45 +113,27 @@ h2 {
 <body>
 
 <div class="quiz-container">
-  <div class="top-icons">
-    <button class="icon-btn" id="endBtn" title="End Study Session">🚩</button>
-    <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
-    <div class="settings-dropdown" id="settingsMenu">
-      <label><input type="checkbox" id="readAloud"> Read Aloud</label>
-      <label><input type="checkbox" id="bigFont"> Big Font Size</label>
-      <label>Change Box Colors:
-        <input type="color" id="colorRed" value="#e74c3c">
-        <input type="color" id="colorOrange" value="#f39c12">
-        <input type="color" id="colorGreen" value="#27ae60">
-        <input type="color" id="colorBlue" value="#2980b9">
-      </label>
-    </div>
-  </div>
-
   <h2 id="setTitle">Loading...</h2>
-
   <div class="question-box" id="questionBox">
     <img id="questionImage" src="" alt="">
     <div id="questionText"></div>
   </div>
-
   <div class="options-grid">
     <button class="option-btn red" id="btnRed"></button>
     <button class="option-btn orange" id="btnOrange"></button>
     <button class="option-btn green" id="btnGreen"></button>
     <button class="option-btn blue" id="btnBlue"></button>
   </div>
-
   <button id="nextBtn" disabled>Next Question</button>
 </div>
 
 <script>
+// --- Load User & Set ---
 let user = JSON.parse(localStorage.getItem("quizterraUser"));
-if(!user) window.location = "login.html";
+if(!user) { alert("No user!"); window.location="login.html"; }
 
 const params = new URLSearchParams(window.location.search);
 const setId = params.get("setId");
-
 if(!setId) { alert("No set selected!"); window.location="select.html"; }
 
 const sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
@@ -185,6 +142,7 @@ if(!set) { alert("Set not found!"); window.location="select.html"; }
 
 document.getElementById("setTitle").textContent = set.name;
 
+// --- Elements ---
 let currentQuestion = 0;
 const questionBox = document.getElementById("questionBox");
 const questionImage = document.getElementById("questionImage");
@@ -192,123 +150,80 @@ const questionText = document.getElementById("questionText");
 const nextBtn = document.getElementById("nextBtn");
 
 const btns = {
-  "Red": document.getElementById("btnRed"),
-  "Orange": document.getElementById("btnOrange"),
-  "Green": document.getElementById("btnGreen"),
-  "Blue": document.getElementById("btnBlue")
+  Red: document.getElementById("btnRed"),
+  Orange: document.getElementById("btnOrange"),
+  Green: document.getElementById("btnGreen"),
+  Blue: document.getElementById("btnBlue")
 };
 
-// Settings
-const settingsBtn = document.getElementById("settingsBtn");
-const settingsMenu = document.getElementById("settingsMenu");
-settingsBtn.onclick = () => {
-  settingsMenu.style.display = settingsMenu.style.display === "flex" ? "none" : "flex";
-}
-
-const readAloudCheckbox = document.getElementById("readAloud");
-const bigFontCheckbox = document.getElementById("bigFont");
-
-const colorInputs = {
-  Red: document.getElementById("colorRed"),
-  Orange: document.getElementById("colorOrange"),
-  Green: document.getElementById("colorGreen"),
-  Blue: document.getElementById("colorBlue")
-}
-
-Object.keys(colorInputs).forEach(color => {
-  colorInputs[color].oninput = () => btns[color].style.background = colorInputs[color].value;
-});
-
-document.getElementById("endBtn").onclick = () => {
-  if(confirm("End study session now?")) window.location="select.html";
-}
-
-function showQuestion(index) {
+// --- Show Question ---
+function showQuestion(index){
   const q = set.questions[index];
-
-  if(q.image){
-    questionImage.src = q.image;
-    questionImage.style.display = "block";
-  } else {
-    questionImage.style.display = "none";
-  }
-
   questionText.textContent = q.question;
-
-  // Read aloud optional (comment out if crashes)
-  /*
-  if(readAloudCheckbox.checked && 'speechSynthesis' in window) {
-    const utterance = new SpeechSynthesisUtterance(q.question);
-    speechSynthesis.speak(utterance);
-  }
-  */
+  if(q.image){ questionImage.src = q.image; questionImage.style.display="block"; } 
+  else { questionImage.style.display="none"; }
 
   nextBtn.disabled = true;
 
+  // Shuffle options
   let options = [...q.options];
-  for (let i = options.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [options[i], options[j]] = [options[j], options[i]];
+  for(let i=options.length-1;i>0;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [options[i],options[j]]=[options[j],options[i]];
   }
 
   const colors = ["Red","Orange","Green","Blue"];
-  colors.forEach((color, i) => {
+  colors.forEach((color,i)=>{
     const btn = btns[color];
     btn.classList.remove("option-correct","option-wrong");
-
-    if(options[i]) {
+    if(options[i]){
       btn.textContent = options[i];
       btn.disabled = false;
-      btn.onclick = () => selectAnswer(btn.textContent, q.answer);
+      btn.onclick = ()=> selectAnswer(btn.textContent,q.answer);
     } else {
       btn.textContent = "";
       btn.disabled = true;
       btn.onclick = null;
     }
   });
-
-  questionText.style.fontSize = bigFontCheckbox.checked ? "28px" : "20px";
 }
 
-function selectAnswer(selectedText, correctText) {
-  Object.keys(btns).forEach(c => btns[c].disabled = true);
+// --- Select Answer ---
+function selectAnswer(selected,correct){
+  Object.values(btns).forEach(b=>b.disabled=true);
 
-  if(!user.stats) user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0, lastClaim:null, studyWeeks:0 };
-  const stats = user.stats;
+  if(!user.stats) user.stats={level:0,xp:0,coins:0,gamesPlayed:0,correct:0,wrong:0,studyWeeks:0};
+  const stats=user.stats;
 
-  const selected = selectedText.trim().toLowerCase();
-  const correct = correctText.trim().toLowerCase();
+  const sel=selected.trim().toLowerCase();
+  const cor=correct.trim().toLowerCase();
 
-  if(selected === correct) {
-    Object.values(btns).forEach(btn => { 
-      if(btn.textContent.trim().toLowerCase() === selected) btn.classList.add("option-correct"); 
-    });
-    stats.correct += 1;
+  if(sel===cor){
+    Object.values(btns).forEach(b=>{ if(b.textContent.trim().toLowerCase()===sel) b.classList.add("option-correct"); });
+    stats.correct++;
   } else {
-    Object.values(btns).forEach(btn => {
-      const btnText = btn.textContent.trim().toLowerCase();
-      if(btnText === selected) btn.classList.add("option-wrong");
-      if(btnText === correct) btn.classList.add("option-correct");
+    Object.values(btns).forEach(b=>{
+      const t=b.textContent.trim().toLowerCase();
+      if(t===sel) b.classList.add("option-wrong");
+      if(t===cor) b.classList.add("option-correct");
     });
-    stats.wrong += 1;
+    stats.wrong++;
   }
-
-  localStorage.setItem("quizterraUser", JSON.stringify(user));
-  nextBtn.disabled = false;
+  localStorage.setItem("quizterraUser",JSON.stringify(user));
+  nextBtn.disabled=false;
 }
 
-nextBtn.onclick = () => {
+// --- Next Question ---
+nextBtn.onclick=()=>{
   currentQuestion++;
-  if(currentQuestion >= set.questions.length) {
-    user.stats.gamesPlayed += 1;
-    user.stats.studyWeeks += 1;
-    user.stats.level = user.stats.studyWeeks;
-    localStorage.setItem("quizterraUser", JSON.stringify(user));
+  if(currentQuestion>=set.questions.length){
+    user.stats.gamesPlayed++;
+    user.stats.studyWeeks++;
+    user.stats.level=user.stats.studyWeeks;
+    localStorage.setItem("quizterraUser",JSON.stringify(user));
     alert("You finished studying this set!");
-    window.location = "stats.html";
-  } else {
-    showQuestion(currentQuestion);
-  }
+    window.location="stats.html";
+  } else showQuestion(currentQuestion);
 }
 
 showQuestion(currentQuestion);
