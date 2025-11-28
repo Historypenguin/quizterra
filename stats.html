@@ -95,9 +95,7 @@
     </div>
 
     <!-- Weekly Study Streak -->
-    <div class="weekly-streak" id="weeklyStreak">
-      <!-- Week boxes inserted here -->
-    </div>
+    <div class="weekly-streak" id="weeklyStreak"></div>
 
     <div class="stats-grid">
       <div class="card"><h3>Level</h3><div class="stat" id="level">0</div></div>
@@ -118,7 +116,7 @@ window.onload = () => {
   document.getElementById("profilePic").src = user.picture || "";
 
   if(!user.stats) {
-    user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0, lastClaim:null, studyWeeks:0 };
+    user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0, lastClaim:null, studyWeeks:0, lastLevelMilestone:0 };
     localStorage.setItem("quizterraUser", JSON.stringify(user));
   }
 
@@ -172,19 +170,12 @@ window.onload = () => {
     }
   };
 
-  // Level Progress Bar & Continuous XP
+  // Level Progress Bar
   const levelProgress = document.getElementById("levelProgress");
   function updateLevelProgress() {
-    let progressPercent = Math.min(100, (stats.studyWeeks % 10) * 10); // 10 weeks per level
+    let progressPercent = Math.min(100, (stats.studyWeeks % 10) * 10);
     levelProgress.style.width = progressPercent + "%";
     levelProgress.innerText = progressPercent + "%";
-
-    // Continuous XP after level 10
-    if(stats.level >= 10){
-      stats.xp += 1;
-      document.getElementById("xp").innerText = stats.xp;
-      localStorage.setItem("quizterraUser", JSON.stringify(user));
-    }
   }
   updateLevelProgress();
 
@@ -199,14 +190,21 @@ window.onload = () => {
     weeklyStreak.appendChild(weekDiv);
   }
 
-  // Level Up check
+  // Level Up check & XP increase only once per milestone
   function checkLevelUp() {
-    let newLevel = Math.floor(stats.studyWeeks / 10) + 1;
-    if(newLevel > stats.level){
-      stats.level = newLevel;
+    const currentMilestone = Math.floor(stats.studyWeeks / 10);
+    if(currentMilestone > stats.lastLevelMilestone){
+      stats.level = currentMilestone + 1;
       countUp(document.getElementById("level"), stats.level);
-      updateLevelProgress();
+
+      if(stats.level >= 10){
+        stats.xp += 1;
+        countUp(document.getElementById("xp"), stats.xp);
+      }
+
+      stats.lastLevelMilestone = currentMilestone;
       localStorage.setItem("quizterraUser", JSON.stringify(user));
+      updateLevelProgress();
     }
   }
   checkLevelUp();
