@@ -16,6 +16,7 @@ body {
   align-items: flex-start;
   padding: 40px;
 }
+
 .quiz-container {
   background: rgba(0,0,0,0.3);
   border-radius: 20px;
@@ -27,6 +28,7 @@ body {
   gap: 20px;
   position: relative;
 }
+
 .top-icons {
   position: absolute;
   top: 15px;
@@ -34,6 +36,7 @@ body {
   display: flex;
   gap: 15px;
 }
+
 .icon-btn {
   background: rgba(255,255,255,0.2);
   border: none;
@@ -45,7 +48,9 @@ body {
   transition: 0.3s;
 }
 .icon-btn:hover { background: rgba(255,255,255,0.4); }
+
 h2 { text-align: center; font-size: 28px; margin: 0; }
+
 .question-box {
   background: rgba(255,255,255,0.1);
   padding: 20px;
@@ -58,12 +63,14 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   gap: 10px;
 }
 .question-box img { max-width: 100%; border-radius: 12px; display: none; }
+
 .options-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
   margin-top: 10px;
 }
+
 .option-btn {
   padding: 20px;
   border-radius: 15px;
@@ -75,12 +82,15 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   transition: transform 0.2s, opacity 0.2s;
 }
 .option-btn:hover { transform: scale(1.03); opacity: 0.9; }
+
 .red { background: #e74c3c; }
 .orange { background: #f39c12; }
 .green { background: #27ae60; }
 .blue { background: #2980b9; }
+
 .option-correct { border: 3px solid #28a745 !important; }
 .option-wrong { border: 3px solid #dc3545 !important; }
+
 .settings-dropdown {
   display: none;
   position: absolute;
@@ -93,6 +103,7 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   gap: 10px;
 }
 .settings-dropdown label { cursor: pointer; font-size: 16px; }
+
 #nextBtn {
   background: #8e2de2;
   color: white;
@@ -143,7 +154,7 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
 </div>
 
 <script>
-// Load User & Set
+// --- Load User & Set ---
 let user = JSON.parse(localStorage.getItem("quizterraUser"));
 if(!user) window.location="login.html";
 
@@ -152,16 +163,18 @@ const setId = params.get("setId");
 if(!setId) { alert("No set selected!"); window.location="select.html"; }
 
 const sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
-const set = sets.find(s => s.id === setId);
+const set = sets.find(s=>s.id===setId);
 if(!set) { alert("Set not found!"); window.location="select.html"; }
 
 document.getElementById("setTitle").textContent = set.name;
 
-// Elements
+// --- Elements ---
 let currentQuestion = 0;
+const questionBox = document.getElementById("questionBox");
 const questionImage = document.getElementById("questionImage");
 const questionText = document.getElementById("questionText");
 const nextBtn = document.getElementById("nextBtn");
+
 const btns = {
   Red: document.getElementById("btnRed"),
   Orange: document.getElementById("btnOrange"),
@@ -169,79 +182,73 @@ const btns = {
   Blue: document.getElementById("btnBlue")
 };
 
-// Settings
+// --- Settings ---
 const settingsBtn = document.getElementById("settingsBtn");
 const settingsMenu = document.getElementById("settingsMenu");
-settingsBtn.onclick = ()=>{ settingsMenu.style.display = settingsMenu.style.display === "flex" ? "none" : "flex"; }
+settingsBtn.onclick = ()=>{ settingsMenu.style.display = settingsMenu.style.display==="flex"?"none":"flex"; }
 
 const readAloudCheckbox = document.getElementById("readAloud");
 const bigFontCheckbox = document.getElementById("bigFont");
-
 const colorInputs = {
   Red: document.getElementById("colorRed"),
   Orange: document.getElementById("colorOrange"),
   Green: document.getElementById("colorGreen"),
   Blue: document.getElementById("colorBlue")
-}
-Object.keys(colorInputs).forEach(color=>{
-  colorInputs[color].oninput = ()=> btns[color].style.background = colorInputs[color].value;
-});
+};
+Object.keys(colorInputs).forEach(c=>colorInputs[c].oninput=()=>btns[c].style.background=colorInputs[c].value);
 
-// End session
-document.getElementById("endBtn").onclick = ()=>{ if(confirm("End study session now?")) window.location="select.html"; }
+document.getElementById("endBtn").onclick=()=>{ if(confirm("End study session now?")) window.location="select.html"; };
 
-// Show question
+// --- Show Question ---
 function showQuestion(index){
   const q = set.questions[index];
   questionText.textContent = q.question;
   if(q.image){ questionImage.src=q.image; questionImage.style.display="block"; }
-  else{ questionImage.style.display="none"; }
+  else questionImage.style.display="none";
 
   nextBtn.disabled = true;
 
   const colors = ["Red","Orange","Green","Blue"];
-  colors.forEach((color,i)=>{
-    const btn = btns[color];
-    btn.disabled=false;
+  colors.forEach((c,i)=>{
+    const btn=btns[c];
     btn.classList.remove("option-correct","option-wrong");
+    btn.disabled = !q.options[i];
     btn.textContent = q.options[i] || "";
-    btn.onclick = ()=> selectAnswer(q.options[i], q.answer);
+    btn.onclick = ()=>selectAnswer(q.options[i], q.answer);
   });
 
-  questionText.style.fontSize = bigFontCheckbox.checked ? "28px" : "20px";
+  questionBox.style.fontSize = bigFontCheckbox.checked?"28px":"20px";
 }
 
-// Select answer with forgiving match
+// --- Select Answer ---
 function selectAnswer(selected, correct){
   Object.values(btns).forEach(b=>b.disabled=true);
-
   if(!user.stats) user.stats={level:0,xp:0,coins:0,gamesPlayed:0,correct:0,wrong:0,studyWeeks:0};
   const stats=user.stats;
 
-  const normalize = str => str.trim().toLowerCase();
-  const sel = normalize(selected);
-  const cor = normalize(correct);
+  const sel=selected.trim().toLowerCase();
+  const cor=correct.trim().toLowerCase();
 
-  if(sel === cor || sel.includes(cor) || cor.includes(sel)){
-    Object.values(btns).forEach(b=>{ if(normalize(b.textContent) === cor) b.classList.add("option-correct"); });
+  if(sel===cor){
+    Object.values(btns).forEach(b=>{ if(b.textContent.trim().toLowerCase()===sel) b.classList.add("option-correct"); });
     stats.correct++;
   } else {
     Object.values(btns).forEach(b=>{
-      const t = normalize(b.textContent);
-      if(t === sel) b.classList.add("option-wrong");
-      if(t === cor) b.classList.add("option-correct");
+      const t=b.textContent.trim().toLowerCase();
+      if(t===sel) b.classList.add("option-wrong");
+      if(t===cor) b.classList.add("option-correct");
     });
     stats.wrong++;
   }
 
   localStorage.setItem("quizterraUser", JSON.stringify(user));
-  nextBtn.disabled=false;
+  nextBtn.disabled = false;
 }
 
-// Next question
+// --- Next Question ---
 nextBtn.onclick = ()=>{
   currentQuestion++;
-  if(currentQuestion>=set.questions.length){
+  if(currentQuestion >= set.questions.length){
     user.stats.gamesPlayed++;
     user.stats.studyWeeks++;
     user.stats.level = user.stats.studyWeeks;
@@ -251,6 +258,7 @@ nextBtn.onclick = ()=>{
   } else showQuestion(currentQuestion);
 }
 
+// --- Start ---
 showQuestion(currentQuestion);
 </script>
 </body>
