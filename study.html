@@ -153,11 +153,13 @@ if(!user) window.location = "login.html";
 
 const params = new URLSearchParams(window.location.search);
 const setId = params.get("setId");
-if(!setId) { alert("No set selected!"); window.location="select.html"; }
+if(!setId) { alert("No set selected!"); window.location="sets.html"; }
 
 const sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
 const set = sets.find(s => s.id === setId);
-if(!set) { alert("Set not found!"); window.location="select.html"; }
+if(!set) { alert("Set not found!"); window.location="sets
+  
+  .html"; }
 
 document.getElementById("setTitle").textContent = set.name;
 
@@ -176,7 +178,7 @@ const readAloudCheckbox = document.getElementById("readAloud");
 const bigFontCheckbox = document.getElementById("bigFont");
 
 document.getElementById("endBtn").onclick = () => {
-  if(confirm("End study session now?")) window.location="select.html";
+  if(confirm("End study session now?")) window.location="stats.html";
 }
 
 function showQuestion(index) {
