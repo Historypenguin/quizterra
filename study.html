@@ -266,19 +266,20 @@ function selectAnswer(selectedText, correctText) {
   if(!user.stats) user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0, lastClaim:null, studyWeeks:0 };
   const stats = user.stats;
 
-  // Normalize strings for comparison
+  // Normalize text for comparison
   const selected = selectedText.trim().toLowerCase();
   const correct = correctText.trim().toLowerCase();
 
   if(selected === correct) {
-    Object.values(btns).forEach(btn => {
-      if(btn.textContent.trim().toLowerCase() === selected) btn.classList.add("option-correct");
+    Object.values(btns).forEach(btn => { 
+      if(btn.textContent.trim().toLowerCase() === selected) btn.classList.add("option-correct"); 
     });
     stats.correct += 1;
   } else {
     Object.values(btns).forEach(btn => {
-      if(btn.textContent.trim().toLowerCase() === selected) btn.classList.add("option-wrong");
-      if(btn.textContent.trim().toLowerCase() === correct) btn.classList.add("option-correct");
+      const btnText = btn.textContent.trim().toLowerCase();
+      if(btnText === selected) btn.classList.add("option-wrong");
+      if(btnText === correct) btn.classList.add("option-correct");
     });
     stats.wrong += 1;
   }
