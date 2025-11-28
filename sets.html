@@ -102,6 +102,31 @@
     }
     .set-card p { font-size: 15px; opacity: .9; }
 
+    .card-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .card-btns button {
+      padding: 8px 14px;
+      border-radius: 25px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 14px;
+    }
+
+    .edit-btn { background: #ffa500; color: white; }
+    .edit-btn:hover { background: #ffb733; transform: scale(1.05); }
+
+    .delete-btn { background: #ff4e4e; color: white; }
+    .delete-btn:hover { background: #ff6b6b; transform: scale(1.05); }
+
+    .play-btn { background: #00ff95; color: black; }
+    .play-btn:hover { background: #33ffaa; transform: scale(1.05); }
+
     /* Create Set Form */
     #createSetForm {
       display: none;
@@ -167,7 +192,7 @@
 
       <button onclick="addQuestion()">+ Add Question</button>
       <br><br>
-      <button onclick="createSet()">Save Set</button>
+      <button id="saveSetBtn" onclick="createSet()">Save Set</button>
     </div>
 
     <div class="sets-grid" id="setsGrid"></div>
@@ -218,14 +243,11 @@ function addQuestion() {
   const html = `
     <div class="question-block">
       <input type="text" class="q-text" placeholder="Question Text">
-
       <input type="text" class="q-img" placeholder="Image/GIF URL (optional)">
-
       <input type="text" class="opt1" placeholder="Option 1">
       <input type="text" class="opt2" placeholder="Option 2">
       <input type="text" class="opt3" placeholder="Option 3">
       <input type="text" class="opt4" placeholder="Option 4">
-
       <select class="q-correct">
         <option value="0">Correct Answer: Option 1</option>
         <option value="1">Correct Answer: Option 2</option>
@@ -274,12 +296,70 @@ function createSet() {
 }
 
 function editSet(id) {
-  localStorage.setItem("editingSet", id);
-  window.location = "create-set.html";
+  const set = sets.find(s => s.id === id);
+  if (!set) return alert("Set not found!");
+
+  toggleCreateForm();
+
+  document.getElementById("setName").value = set.name;
+  const container = document.getElementById("questionsContainer");
+  container.innerHTML = ""; 
+
+  set.questions.forEach(q => {
+    const html = `
+      <div class="question-block">
+        <input type="text" class="q-text" placeholder="Question Text" value="${q.question}">
+        <input type="text" class="q-img" placeholder="Image/GIF URL (optional)" value="${q.image}">
+        <input type="text" class="opt1" placeholder="Option 1" value="${q.options[0]}">
+        <input type="text" class="opt2" placeholder="Option 2" value="${q.options[1]}">
+        <input type="text" class="opt3" placeholder="Option 3" value="${q.options[2]}">
+        <input type="text" class="opt4" placeholder="Option 4" value="${q.options[3]}">
+        <select class="q-correct">
+          <option value="0" ${q.correct===0?'selected':''}>Correct Answer: Option 1</option>
+          <option value="1" ${q.correct===1?'selected':''}>Correct Answer: Option 2</option>
+          <option value="2" ${q.correct===2?'selected':''}>Correct Answer: Option 3</option>
+          <option value="3" ${q.correct===3?'selected':''}>Correct Answer: Option 4</option>
+        </select>
+      </div>
+    `;
+    container.insertAdjacentHTML("beforeend", html);
+  });
+
+  const saveBtn = document.getElementById("saveSetBtn");
+  saveBtn.textContent = "Update Set";
+
+  saveBtn.onclick = function() {
+    const name = document.getElementById("setName").value.trim();
+    if (!name) return alert("Enter a set name.");
+
+    const blocks = [...document.querySelectorAll(".question-block")];
+    if (blocks.length === 0) return alert("Add at least one question.");
+
+    const questionData = blocks.map(block => {
+      return {
+        question: block.querySelector(".q-text").value.trim(),
+        image: block.querySelector(".q-img").value.trim(),
+        options: [
+          block.querySelector(".opt1").value.trim(),
+          block.querySelector(".opt2").value.trim(),
+          block.querySelector(".opt3").value.trim(),
+          block.querySelector(".opt4").value.trim()
+        ],
+        correct: Number(block.querySelector(".q-correct").value)
+      };
+    });
+
+    set.name = name;
+    set.questions = questionData;
+    localStorage.setItem("quizterraSets", JSON.stringify(sets));
+
+    alert("Set Updated!");
+    location.reload();
+  };
 }
 
 function playSet(id) {
-  alert("Game mode coming soon! Data loads correctly.");
+  window.location = `https://historypenguin.github.io/quizterra/play.html?setId=${id}`;
 }
 
 function deleteSet(id) {
