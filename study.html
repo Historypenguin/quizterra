@@ -69,6 +69,11 @@
     gap: 10px;
     position: relative;
     z-index: 1;
+    pointer-events: none; /* allow clicks to pass through */
+  }
+
+  .question-box * {
+    pointer-events: auto; /* text/images inside still usable */
   }
 
   .question-box img {
@@ -82,7 +87,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     position: relative;
-    z-index: 1; /* ensure buttons are above background */
+    z-index: 1;
   }
 
   .option-btn {
@@ -94,7 +99,6 @@
     border: none;
     color: white;
     transition: transform 0.2s, opacity 0.2s;
-    pointer-events: auto; /* ensure clickable */
   }
 
   .option-btn:hover { transform: scale(1.03); opacity: 0.9; }
@@ -278,7 +282,6 @@ function selectAnswer(selectedText, correctText) {
   if(!user.stats) user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0, lastClaim:null, studyWeeks:0 };
   const stats = user.stats;
 
-  // Normalize text for comparison
   const selected = selectedText.trim().toLowerCase();
   const correct = correctText.trim().toLowerCase();
 
