@@ -60,6 +60,12 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   font-weight: 600;
 }
 
+.question-box img {
+  max-width: 100%;
+  border-radius: 15px;
+  margin-top: 15px;
+}
+
 .options-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -201,7 +207,21 @@ document.getElementById("endBtn").onclick = () => {
 // Show question exactly as set
 function showQuestion(index) {
   const q = set.questions[index];
-  questionBox.textContent = q.question;
+  
+  // Clear previous content
+  questionBox.innerHTML = "";
+
+  // Add text
+  const questionText = document.createElement("div");
+  questionText.textContent = q.question;
+  questionBox.appendChild(questionText);
+
+  // Add image if present
+  if(q.image) {
+    const img = document.createElement("img");
+    img.src = q.image;
+    questionBox.appendChild(img);
+  }
 
   if(readAloudCheckbox.checked && 'speechSynthesis' in window) {
     const utterance = new SpeechSynthesisUtterance(q.question);
@@ -216,7 +236,7 @@ function showQuestion(index) {
     btn.disabled = false;
     btn.classList.remove("option-correct","option-wrong");
     btn.textContent = q.options[i] || "";
-    btn.onclick = () => selectAnswer(btn.textContent, q.answer); // exact match
+    btn.onclick = () => selectAnswer(btn.textContent, q.correct); // updated: use q.correct
   });
 
   questionBox.style.fontSize = bigFontCheckbox.checked ? "28px" : "20px";
