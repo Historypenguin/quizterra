@@ -172,11 +172,21 @@ window.onload = () => {
     }
   };
 
-  // Level Progress Bar
+  // Level Progress Bar & Continuous XP
   const levelProgress = document.getElementById("levelProgress");
-  const progressPercent = Math.min(100, (stats.studyWeeks%10)*10); // 10 weeks per level
-  levelProgress.style.width = progressPercent+"%";
-  levelProgress.innerText = progressPercent+"%";
+  function updateLevelProgress() {
+    let progressPercent = Math.min(100, (stats.studyWeeks % 10) * 10); // 10 weeks per level
+    levelProgress.style.width = progressPercent + "%";
+    levelProgress.innerText = progressPercent + "%";
+
+    // Continuous XP after level 10
+    if(stats.level >= 10){
+      stats.xp += 1;
+      document.getElementById("xp").innerText = stats.xp;
+      localStorage.setItem("quizterraUser", JSON.stringify(user));
+    }
+  }
+  updateLevelProgress();
 
   // Weekly Streak
   const weeklyStreak = document.getElementById("weeklyStreak");
@@ -188,6 +198,18 @@ window.onload = () => {
     weekDiv.innerText=i;
     weeklyStreak.appendChild(weekDiv);
   }
+
+  // Level Up check
+  function checkLevelUp() {
+    let newLevel = Math.floor(stats.studyWeeks / 10) + 1;
+    if(newLevel > stats.level){
+      stats.level = newLevel;
+      countUp(document.getElementById("level"), stats.level);
+      updateLevelProgress();
+      localStorage.setItem("quizterraUser", JSON.stringify(user));
+    }
+  }
+  checkLevelUp();
 
   // Logout
   document.getElementById("logoutBtn").onclick=()=>{
