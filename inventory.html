@@ -3,49 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <title>Quizterra | Inventory</title>
-<link href="https://fonts.googleapis.com/css2?family=Titan+One&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
 <style>
   body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Titan One', sans-serif;
+    background: linear-gradient(135deg, #f5a623, #f76b1c);
     margin: 0;
     min-height: 100vh;
-    background: linear-gradient(135deg, #ffcc33, #ff6600);
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
-  }
-  h1 {
-    font-family: 'Titan One', cursive;
     color: #fff;
-    margin-bottom: 20px;
   }
+
+  h1 {
+    margin-bottom: 20px;
+    text-shadow: 2px 2px #000;
+  }
+
   #inventory-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 15px;
     width: 100%;
-    max-width: 1000px;
+    max-width: 900px;
   }
+
   .blook-card {
-    background: #fff8;
-    border-radius: 10px;
-    padding: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    padding: 10px;
     transition: transform 0.2s;
   }
-  .blook-card:hover {
-    transform: scale(1.05);
-  }
+
   .blook-card img {
-    width: 100%;
-    border-radius: 8px;
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
   }
+
+  .blook-card:hover {
+    transform: scale(1.1);
+  }
+
+  /* Rarity colors */
   .rarity-common { border: 2px solid #ccc; }
-  .rarity-rare { border: 2px solid #00f; }
-  .rarity-epic { border: 2px solid #a0f; }
-  .rarity-legendary { border: 2px solid #ff0; }
+  .rarity-rare { border: 2px solid #3498db; }
+  .rarity-epic { border: 2px solid #9b59b6; }
+  .rarity-legendary { border: 2px solid #f1c40f; }
+
+  /* Highlight animation for new blooks */
+  .highlight {
+    animation: flash 2s ease-in-out;
+    border-width: 3px !important;
+  }
+
+  @keyframes flash {
+    0% { transform: scale(1); box-shadow: 0 0 10px #ff0; }
+    50% { transform: scale(1.1); box-shadow: 0 0 25px #ff0; }
+    100% { transform: scale(1); box-shadow: 0 0 10px #ff0; }
+  }
 </style>
 </head>
 <body>
@@ -54,32 +73,42 @@
 <div id="inventory-grid"></div>
 
 <script>
-function getUser() {
-  return JSON.parse(localStorage.getItem('quizterraCurrentUser')) || {};
-}
-
-function displayInventory() {
-  const user = getUser();
+  // Load user inventory from localStorage
+  const user = JSON.parse(localStorage.getItem('quizterraCurrentUser')) || {};
   const inventory = user.inventory || [];
+
   const grid = document.getElementById('inventory-grid');
 
-  grid.innerHTML = '';
-  inventory.forEach(item => {
+  function displayInventory() {
+    grid.innerHTML = '';
+    inventory.forEach(blook => {
+      const card = document.createElement('div');
+      card.className = `blook-card rarity-${blook.rarity || 'common'}`;
+      card.innerHTML = `
+        <img src="${blook.img}" alt="${blook.name}">
+        <div style="margin-top:6px;font-weight:700">${blook.name}</div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  displayInventory();
+
+  // Function to highlight newly added blook
+  function highlightNewBlook(newBlook) {
     const card = document.createElement('div');
-    card.className = 'blook-card';
-    const rarityClass = 'rarity-' + (item.rarity || 'common');
+    card.className = `blook-card rarity-${newBlook.rarity || 'common'} highlight`;
     card.innerHTML = `
-      <div class="${rarityClass}">
-        <img src="${item.img}" alt="${item.name}">
-      </div>
-      <div style="margin-top:6px;font-weight:700">${item.name}</div>
+      <img src="${newBlook.img}" alt="${newBlook.name}">
+      <div style="margin-top:6px;font-weight:700">${newBlook.name}</div>
     `;
     grid.appendChild(card);
-  });
-}
 
-// Initialize
-displayInventory();
+    setTimeout(() => card.classList.remove('highlight'), 2000);
+  }
+
+  // Example usage if a pack is opened:
+  // highlightNewBlook({name: 'Cheese', img: 'https://via.placeholder.com/80', rarity: 'rare'});
 </script>
 
 </body>
