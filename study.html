@@ -45,6 +45,7 @@ body {
   transition: 0.3s;
 }
 .icon-btn:hover { background: rgba(255,255,255,0.4); }
+
 h2 { text-align: center; font-size: 28px; margin: 0; }
 .question-box {
   background: rgba(255,255,255,0.1);
@@ -58,11 +59,11 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   gap: 10px;
 }
 .question-box img { max-width: 100%; border-radius: 12px; display: none; }
+
 .options-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
-  margin-top: 10px;
 }
 .option-btn {
   padding: 20px;
@@ -81,6 +82,7 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
 .blue { background: #2980b9; }
 .option-correct { border: 3px solid #28a745 !important; }
 .option-wrong { border: 3px solid #dc3545 !important; }
+
 .settings-dropdown {
   display: none;
   position: absolute;
@@ -93,6 +95,7 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   gap: 10px;
 }
 .settings-dropdown label { cursor: pointer; font-size: 16px; }
+
 #nextBtn {
   background: #8e2de2;
   color: white;
@@ -127,23 +130,26 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   </div>
 
   <h2 id="setTitle">Loading...</h2>
+
   <div class="question-box" id="questionBox">
     <img id="questionImage" src="" alt="">
     <div id="questionText"></div>
   </div>
+
   <div class="options-grid">
     <button class="option-btn red" id="btnRed"></button>
     <button class="option-btn orange" id="btnOrange"></button>
     <button class="option-btn green" id="btnGreen"></button>
     <button class="option-btn blue" id="btnBlue"></button>
   </div>
+
   <button id="nextBtn" disabled>Next Question</button>
 </div>
 
 <script>
-// --- Load User & Set ---
+// --- Load user & set ---
 let user = JSON.parse(localStorage.getItem("quizterraUser"));
-if(!user) { alert("No user!"); window.location="login.html"; }
+if(!user) window.location="login.html";
 
 const params = new URLSearchParams(window.location.search);
 const setId = params.get("setId");
@@ -172,8 +178,9 @@ const btns = {
 // --- Settings ---
 const settingsBtn = document.getElementById("settingsBtn");
 const settingsMenu = document.getElementById("settingsMenu");
-settingsBtn.onclick = () => { settingsMenu.style.display = settingsMenu.style.display === "flex" ? "none" : "flex"; }
-
+settingsBtn.onclick = () => {
+  settingsMenu.style.display = settingsMenu.style.display === "flex" ? "none" : "flex";
+}
 const readAloudCheckbox = document.getElementById("readAloud");
 const bigFontCheckbox = document.getElementById("bigFont");
 
@@ -187,59 +194,54 @@ Object.keys(colorInputs).forEach(color => {
   colorInputs[color].oninput = () => btns[color].style.background = colorInputs[color].value;
 });
 
-document.getElementById("endBtn").onclick = () => { if(confirm("End study session now?")) window.location="select.html"; }
+// --- End session ---
+document.getElementById("endBtn").onclick = () => {
+  if(confirm("End study session now?")) window.location="select.html";
+}
 
 // --- Show Question ---
 function showQuestion(index){
   const q = set.questions[index];
   questionText.textContent = q.question;
-  if(q.image){ questionImage.src=q.image; questionImage.style.display="block"; } 
+  if(q.image){ questionImage.src=q.image; questionImage.style.display="block"; }
   else{ questionImage.style.display="none"; }
 
-  if(readAloudCheckbox.checked && 'speechSynthesis' in window){
-    speechSynthesis.speak(new SpeechSynthesisUtterance(q.question));
-  }
-
   nextBtn.disabled = true;
-  questionBox.style.fontSize = bigFontCheckbox.checked ? "28px" : "20px";
-
-  // Shuffle options
-  let options = [...q.options];
-  for(let i=options.length-1; i>0; i--){
-    let j=Math.floor(Math.random()*(i+1));
-    [options[i], options[j]] = [options[j], options[i]];
-  }
 
   const colors = ["Red","Orange","Green","Blue"];
   colors.forEach((color,i)=>{
     const btn = btns[color];
     btn.disabled = false;
     btn.classList.remove("option-correct","option-wrong");
-    btn.textContent = options[i] || "";
-    btn.onclick = null;
-    btn.addEventListener('click', function handler(){
-      selectAnswer(options[i], q.answer);
-      btn.removeEventListener('click', handler);
-    });
+    btn.textContent = q.options[i] || "";
+    btn.onclick = () => selectAnswer(btn.textContent, q.answer);
   });
+
+  questionBox.style.fontSize = bigFontCheckbox.checked ? "28px" : "20px";
+
+  // Read Aloud
+  if(readAloudCheckbox.checked && 'speechSynthesis' in window){
+    const utterance = new SpeechSynthesisUtterance(q.question);
+    speechSynthesis.speak(utterance);
+  }
 }
 
 // --- Select Answer ---
 function selectAnswer(selected, correct){
-  Object.values(btns).forEach(b => b.disabled = true);
+  Object.values(btns).forEach(b=>b.disabled=true);
 
   if(!user.stats) user.stats={level:0,xp:0,coins:0,gamesPlayed:0,correct:0,wrong:0,studyWeeks:0};
-  const stats = user.stats;
+  const stats=user.stats;
 
-  const sel = selected.trim().toLowerCase();
-  const cor = correct.trim().toLowerCase();
+  const sel=selected.trim().toLowerCase();
+  const cor=correct.trim().toLowerCase();
 
-  if(sel === cor){
-    Object.values(btns).forEach(b => { if(b.textContent.trim().toLowerCase() === sel) b.classList.add("option-correct"); });
+  if(sel===cor){
+    Object.values(btns).forEach(b=>{ if(b.textContent.trim().toLowerCase()===sel) b.classList.add("option-correct"); });
     stats.correct++;
   } else {
-    Object.values(btns).forEach(b => {
-      const t = b.textContent.trim().toLowerCase();
+    Object.values(btns).forEach(b=>{
+      const t=b.textContent.trim().toLowerCase();
       if(t===sel) b.classList.add("option-wrong");
       if(t===cor) b.classList.add("option-correct");
     });
@@ -263,7 +265,6 @@ nextBtn.onclick = ()=>{
   } else showQuestion(currentQuestion);
 }
 
-// --- Start ---
 showQuestion(currentQuestion);
 </script>
 </body>
