@@ -62,16 +62,6 @@
     border-radius: 15px;
     font-size: 20px;
     font-weight: 600;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .question-box img {
-    max-width: 100%;
-    border-radius: 12px;
-    display: none;
   }
 
   .options-grid {
@@ -92,11 +82,6 @@
   }
 
   .option-btn:hover { transform: scale(1.03); opacity: 0.9; }
-
-  .red { background: #e74c3c; }
-  .orange { background: #f39c12; }
-  .green { background: #27ae60; }
-  .blue { background: #2980b9; }
 
   .option-correct { border: 3px solid #28a745 !important; }
   .option-wrong { border: 3px solid #dc3545 !important; }
@@ -141,25 +126,22 @@
       <label><input type="checkbox" id="readAloud"> Read Aloud</label>
       <label><input type="checkbox" id="bigFont"> Big Font Size</label>
       <label>Change Box Colors:
-        <input type="color" id="colorRed" value="#e74c3c">
-        <input type="color" id="colorOrange" value="#f39c12">
-        <input type="color" id="colorGreen" value="#27ae60">
-        <input type="color" id="colorBlue" value="#2980b9">
+        <input type="color" id="colorRed">
+        <input type="color" id="colorOrange">
+        <input type="color" id="colorGreen">
+        <input type="color" id="colorBlue">
       </label>
     </div>
   </div>
 
   <h2 id="setTitle">Loading...</h2>
-  <div class="question-box" id="questionBox">
-    <img id="questionImage" src="" alt="">
-    <div id="questionText"></div>
-  </div>
+  <div class="question-box" id="questionBox">Question will appear here</div>
 
   <div class="options-grid">
-    <button class="option-btn red" id="btnRed"></button>
-    <button class="option-btn orange" id="btnOrange"></button>
-    <button class="option-btn green" id="btnGreen"></button>
-    <button class="option-btn blue" id="btnBlue"></button>
+    <button class="option-btn" id="btn0">Option 1</button>
+    <button class="option-btn" id="btn1">Option 2</button>
+    <button class="option-btn" id="btn2">Option 3</button>
+    <button class="option-btn" id="btn3">Option 4</button>
   </div>
 
   <button id="nextBtn" disabled>Next Question</button>
@@ -171,7 +153,6 @@ if(!user) window.location = "login.html";
 
 const params = new URLSearchParams(window.location.search);
 const setId = params.get("setId");
-
 if(!setId) { alert("No set selected!"); window.location="select.html"; }
 
 const sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
@@ -182,18 +163,9 @@ document.getElementById("setTitle").textContent = set.name;
 
 let currentQuestion = 0;
 const questionBox = document.getElementById("questionBox");
-const questionImage = document.getElementById("questionImage");
-const questionText = document.getElementById("questionText");
 const nextBtn = document.getElementById("nextBtn");
+const btns = [document.getElementById("btn0"), document.getElementById("btn1"), document.getElementById("btn2"), document.getElementById("btn3")];
 
-const btns = {
-  "Red": document.getElementById("btnRed"),
-  "Orange": document.getElementById("btnOrange"),
-  "Green": document.getElementById("btnGreen"),
-  "Blue": document.getElementById("btnBlue")
-};
-
-// Settings
 const settingsBtn = document.getElementById("settingsBtn");
 const settingsMenu = document.getElementById("settingsMenu");
 settingsBtn.onclick = () => {
@@ -203,76 +175,46 @@ settingsBtn.onclick = () => {
 const readAloudCheckbox = document.getElementById("readAloud");
 const bigFontCheckbox = document.getElementById("bigFont");
 
-const colorInputs = {
-  Red: document.getElementById("colorRed"),
-  Orange: document.getElementById("colorOrange"),
-  Green: document.getElementById("colorGreen"),
-  Blue: document.getElementById("colorBlue")
-}
-
-Object.keys(colorInputs).forEach(color => {
-  colorInputs[color].oninput = () => btns[color].style.background = colorInputs[color].value;
-});
-
-// End session
 document.getElementById("endBtn").onclick = () => {
   if(confirm("End study session now?")) window.location="select.html";
 }
 
 function showQuestion(index) {
   const q = set.questions[index];
+  questionBox.textContent = q.question;
 
-  // Show image if exists
-  if(q.image){
-    questionImage.src = q.image;
-    questionImage.style.display = "block";
-  } else {
-    questionImage.style.display = "none";
-  }
+  btns.forEach((btn,i)=>{
+    btn.textContent = q.options[i];
+    btn.disabled = false;
+    btn.classList.remove("option-correct","option-wrong");
+    btn.onclick = ()=>selectAnswer(q.options[i], q.answer, btn);
+  });
 
-  questionText.textContent = q.question;
+  nextBtn.disabled = true;
+  questionBox.style.fontSize = bigFontCheckbox.checked ? "28px" : "20px";
 
-  if(readAloudCheckbox.checked && 'speechSynthesis' in window) {
+  if(readAloudCheckbox.checked && 'speechSynthesis' in window){
     const utterance = new SpeechSynthesisUtterance(q.question);
     speechSynthesis.speak(utterance);
   }
-
-  nextBtn.disabled = true;
-
-  // Shuffle options
-  let options = [...q.options];
-  for (let i = options.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [options[i], options[j]] = [options[j], options[i]];
-  }
-
-  const colors = ["Red","Orange","Green","Blue"];
-  colors.forEach((color,i)=>{
-    btns[color].disabled = false;
-    btns[color].classList.remove("option-correct","option-wrong");
-    btns[color].textContent = options[i] || "";
-  });
-
-  colors.forEach(color => {
-    btns[color].onclick = () => selectAnswer(btns[color].textContent, q.answer);
-  });
-
-  questionText.style.fontSize = bigFontCheckbox.checked ? "28px" : "20px";
 }
 
-function selectAnswer(selectedText, correctText) {
-  Object.keys(btns).forEach(c => btns[c].disabled = true);
+function selectAnswer(selectedText, correctText, selectedBtn) {
+  btns.forEach(b=>b.disabled=true);
 
   if(!user.stats) user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0, lastClaim:null, studyWeeks:0 };
   const stats = user.stats;
 
-  if(selectedText === correctText) {
-    Object.values(btns).forEach(btn => { if(btn.textContent === selectedText) btn.classList.add("option-correct"); });
+  const selected = selectedText.trim().toLowerCase();
+  const correct = correctText.trim().toLowerCase();
+
+  if(selected === correct){
+    selectedBtn.classList.add("option-correct");
     stats.correct += 1;
   } else {
-    Object.values(btns).forEach(btn => {
-      if(btn.textContent === selectedText) btn.classList.add("option-wrong");
-      if(btn.textContent === correctText) btn.classList.add("option-correct");
+    selectedBtn.classList.add("option-wrong");
+    btns.forEach(b=>{
+      if(b.textContent.trim().toLowerCase() === correct) b.classList.add("option-correct");
     });
     stats.wrong += 1;
   }
@@ -283,18 +225,18 @@ function selectAnswer(selectedText, correctText) {
 
 nextBtn.onclick = () => {
   currentQuestion++;
-  if(currentQuestion >= set.questions.length) {
+  if(currentQuestion >= set.questions.length){
+    if(!user.stats) user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0, lastClaim:null, studyWeeks:0 };
     user.stats.gamesPlayed += 1;
     user.stats.studyWeeks += 1;
     user.stats.level = user.stats.studyWeeks;
     localStorage.setItem("quizterraUser", JSON.stringify(user));
     alert("You finished studying this set!");
     window.location = "stats.html";
-  } else {
-    showQuestion(currentQuestion);
-  }
+  } else showQuestion(currentQuestion);
 }
 
+// Start first question
 showQuestion(currentQuestion);
 </script>
 </body>
