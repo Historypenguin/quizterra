@@ -12,44 +12,63 @@ body {
   background: linear-gradient(135deg, #6a11cb, #2575fc);
   color: white;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 40px;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .quiz-container {
+  display: flex;
+  gap: 30px;
+  max-width: 1000px;
+  width: 100%;
+  margin: auto;
   background: rgba(0,0,0,0.3);
   border-radius: 20px;
-  padding: 30px;
-  max-width: 700px;
-  width: 100%;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+.left-panel, .right-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  position: relative;
+  gap: 30px;
 }
 
-.top-icons {
-  position: absolute;
-  top: 15px;
-  right: 15px;
+.left-panel {
+  flex: 1;
+  align-items: center;
+}
+
+.right-panel {
+  flex: 2;
+}
+
+.player-box, .enemy-box {
   display: flex;
-  gap: 15px;
+  flex-direction: column;
+  align-items: center;
 }
 
-.icon-btn {
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  font-size: 20px;
-  padding: 8px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: 0.3s;
+.hp-bar-bg {
+  width: 150px;
+  height: 15px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 10px;
+  margin-top: 5px;
+  overflow: hidden;
 }
-.icon-btn:hover { background: rgba(255,255,255,0.4); }
 
-h2 { text-align: center; font-size: 28px; margin: 0; }
+.hp-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: #0fa6ff;
+  text-align: right;
+  line-height: 15px;
+  font-weight: bold;
+  padding-right: 5px;
+  transition: width 0.5s;
+}
 
 .question-box {
   background: rgba(255,255,255,0.1);
@@ -57,7 +76,7 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   border-radius: 15px;
   font-size: 20px;
   font-weight: 600;
-  min-height: 100px;
+  min-height: 120px;
 }
 
 .question-box img {
@@ -92,65 +111,60 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
 .option-correct { border: 3px solid #28a745 !important; }
 .option-wrong { border: 3px solid #dc3545 !important; }
 
-#enemy-container, #player-container {
-  text-align:center;
-  margin-bottom:20px;
-}
-#enemy-img, #player-img {
-  width:120px; height:120px; border-radius:12px; border:2px solid white; margin-bottom:5px;
-}
-.hp-bar-bg {
-  width:120px; height:15px; background: rgba(255,255,255,0.3); border-radius:10px; margin:auto;
-  overflow:hidden;
-}
-.hp-bar-fill {
-  height:100%; width:100%; background:#0fa6ff; text-align:right; line-height:15px; font-weight:bold;
-  padding-right:5px; transition: width 0.5s;
-}
-
 #battle-log {
   background: rgba(0,0,0,0.4);
-  padding:15px;
-  border-radius:15px;
-  max-height:200px;
-  overflow-y:auto;
-  font-size:16px;
+  padding: 15px;
+  border-radius: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 16px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+#player-img, #enemy-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  border: 2px solid white;
 }
 </style>
 </head>
 <body>
 
 <div class="quiz-container">
-  <div class="top-icons">
-    <button class="icon-btn" id="endBtn" title="End Battle">🚩</button>
+  <!-- Left panel: Player & Enemy -->
+  <div class="left-panel">
+    <div class="player-box">
+      <img id="player-img" src="https://i.postimg.cc/2yWnW6sY/wizard.png" alt="Player">
+      <div id="player-name">You</div>
+      <div class="hp-bar-bg"><div class="hp-bar-fill" id="player-hp">100</div></div>
+    </div>
+
+    <div class="enemy-box">
+      <img id="enemy-img" src="" alt="Enemy">
+      <div id="enemy-name"></div>
+      <div class="hp-bar-bg"><div class="hp-bar-fill" id="enemy-hp">0</div></div>
+    </div>
   </div>
 
-  <h2 id="setTitle">Loading Battle...</h2>
+  <!-- Right panel: Question & Options -->
+  <div class="right-panel">
+    <h2 id="setTitle">Loading Battle...</h2>
+    <div class="question-box" id="questionBox"></div>
 
-  <!-- Player -->
-  <div id="player-container">
-    <img id="player-img" src="https://i.postimg.cc/2yWnW6sY/wizard.png" alt="Player">
-    <div id="player-name">You</div>
-    <div class="hp-bar-bg"><div class="hp-bar-fill" id="player-hp">100</div></div>
+    <div class="options-grid">
+      <button class="option-btn red" id="btnRed"></button>
+      <button class="option-btn orange" id="btnOrange"></button>
+      <button class="option-btn green" id="btnGreen"></button>
+      <button class="option-btn blue" id="btnBlue"></button>
+    </div>
   </div>
 
-  <!-- Enemy -->
-  <div id="enemy-container">
-    <img id="enemy-img" src="" alt="Enemy">
-    <div id="enemy-name"></div>
-    <div class="hp-bar-bg"><div class="hp-bar-fill" id="enemy-hp">0</div></div>
+  <!-- Battle log -->
+  <div style="width:100%;">
+    <div id="battle-log"></div>
   </div>
-
-  <div class="question-box" id="questionBox"></div>
-
-  <div class="options-grid">
-    <button class="option-btn red" id="btnRed"></button>
-    <button class="option-btn orange" id="btnOrange"></button>
-    <button class="option-btn green" id="btnGreen"></button>
-    <button class="option-btn blue" id="btnBlue"></button>
-  </div>
-
-  <div id="battle-log"></div>
 </div>
 
 <script>
@@ -268,6 +282,12 @@ function nextQuestion(correct, selected){
 
   if(enemy.hp<=0){
     log(`✅ ${enemy.name} defeated!`);
+
+    // Increase player HP by 10 at start of next round
+    playerHp += 10;
+    playerHpBar.style.width = playerHp+"px";
+    playerHpBar.textContent = playerHp;
+
     currentRound++;
     if(currentRound>=enemyRounds.length){
       log("🏆 You won the battle!");
@@ -279,8 +299,6 @@ function nextQuestion(correct, selected){
 
   setTimeout(showQuestion,1000);
 }
-
-document.getElementById("endBtn").onclick=()=>{ if(confirm("End battle?")) location.href="stats.html"; }
 
 loadEnemy();
 </script>
