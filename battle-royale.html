@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quizterra | Battle Royale</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: Poppins, sans-serif;
+    background: linear-gradient(120deg, #47a7ff, #745cff, #ff4ef2);
+    background-size: 400% 400%;
+    animation: gradientMove 10s ease infinite;
+    color: white;
+    padding: 30px;
+  }
+  @keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  h1 { text-align:center; font-size:48px; font-weight:900; }
+  #log {
+    width: 80%; margin: 20px auto;
+    background: rgba(0,0,0,0.4);
+    padding: 20px;
+    border-radius: 18px;
+    height: 400px;
+    overflow-y: auto;
+    font-size:18px;
+  }
+  .btn {
+    padding: 15px 25px; font-size:22px; border:none; border-radius:15px;
+    cursor:pointer; background: linear-gradient(135deg,#6a5acd,#00bfff);
+    color:white; display:block; margin:0 auto 20px auto; transition:0.25s;
+  }
+  .btn:hover { transform:scale(1.05); box-shadow:0 0 15px rgba(0,0,0,0.3); }
+  .player-info { text-align:center; font-size:22px; margin-bottom:15px; }
+  .blook-img { width:40px; height:40px; vertical-align:middle; margin-right:8px; }
+</style>
+</head>
+
+<body>
+
+<h1>Battle Royale</h1>
+<div class="player-info" id="playerInfo"></div>
+<button class="btn" onclick="startBattle()">Start Battle</button>
+<div id="log"></div>
+
+<script>
+let user = JSON.parse(localStorage.getItem("quizterraUser"));
+if(!user){ window.location.href="login.html"; }
+
+let sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
+let playerSet = sets.filter(s=>s.owner===user.username)[0];
+if(!playerSet){ alert("You need at least one set!"); throw "No set"; }
+
+let player = { name: user.username, hp: 100 + (user.stats?.level||0)*10, attack: 10 + (user.stats?.xp||0), alive: true };
+document.getElementById("playerInfo").innerHTML = `<strong>${player.name}</strong><br>HP: ${player.hp} | ATK: ${player.attack}`;
+
+// Blooks by rounds
+let rounds = [
+  {name:"Iced Blue Donut", hp:70, attack:8, image:"https://i.postimg.cc/GpCtt1Yq/Iced-Blue-Donut.webp"},
+  {name:"Stary Bot", hp:90, attack:10, image:"https://i.postimg.cc/dt9ZKTVs/staryBot.png"},
+  {name:"Chef", hp:80, attack:9, image:"https://i.postimg.cc/gnxq22bw/chef.png"},
+  {name:"Cat Milk", hp:60, attack:7, image:"https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails%2FcatMilk.png?1750455696008"},
+  {name:"Spooky Mega Ghost", hp:110, attack:15, image:"https://i.postimg.cc/63SV6Tc6/Spooky-Mega-Ghost-1.gif"},
+  {name:"Blooket Warrior", hp:150, attack:20, image:"https://i.postimg.cc/htNhD5Z3/Blooket-Warrior.gif"}
+];
+
+let currentRound = 0;
+
+function log(msg,img=null){
+  const box=document.getElementById("log");
+  if(img) msg=`<img src="${img}" class="blook-img"> ${msg}`;
+  box.innerHTML+=msg+"<br>";
+  box.scrollTop=box.scrollHeight;
+}
+
+async function askQuestion(){
+  return new Promise((resolve)=>{
+    const q = playerSet.questions[Math.floor(Math.random()*playerSet.questions.length)];
+    let answer = prompt(`${q.question}\nOptions:\n1. ${q.options[0]}\n2. ${q.options[1]}\n3. ${q.options[2]}\n4. ${q.options[3]}`);
+    if(!answer){ resolve(false); return; }
+    let selected = q.options[parseInt(answer)-1];
+    resolve(selected===q.correct);
+  });
+}
+
+async function startBattle(){
+  document.getElementById("log").innerHTML="";
+  currentRound = 0;
+  log("🔥 Battle Royale Started!");
+  nextRound();
+}
+
+async function nextRound(){
+  if(currentRound>=rounds.length){
+    log("<br>🏆 You WON the Battle Royale!");
+    rewardPlayer();
+    return;
+  }
+
+  let enemy = {...rounds[currentRound], alive:true};
+  log(`<br>⚔️ Round ${currentRound+1}: <strong>${enemy.name}</strong> appears!`, enemy.image);
+
+  let interval = setInterval(async ()=>{
+    if(!player.alive){
+      log("<br>💀 You were eliminated!");
+      clearInterval(interval);
+      return;
+    }
+    if(!enemy.alive){
+      clearInterval(interval);
+      currentRound++;
+      log(`<br>✅ ${enemy.name} defeated! Preparing next round...`);
+      setTimeout(nextRound,2000);
+      return;
+    }
+
+    // Player attacks
+    let correct = await askQuestion();
+    let dmg = correct ? player.attack : Math.floor(player.attack/2);
+    log(`${player.name} ${correct?"answered correctly":"answered wrong"} and hits <strong>${enemy.name}</strong> for ${dmg}!`, enemy.image);
+    enemy.hp -= dmg;
+    if(enemy.hp<=0){ enemy.alive=false; }
+
+    // Enemy attacks player
+    if(enemy.alive){
+      player.hp -= enemy.attack;
+      log(`<strong>${enemy.name}</strong> attacked YOU for ${enemy.attack}!`, enemy.image);
+      if(player.hp<=0){ player.alive=false; }
+    }
+
+  },15000); // every 15 seconds
+}
+
+function rewardPlayer(){
+  let winCoins=500;
+  user.stats.coins+=winCoins;
+  localStorage.setItem("quizterraUser",JSON.stringify(user));
+  log(`<br>💰 You earned <strong>${winCoins}</strong> coins!`);
+}
+</script>
+
+</body>
+</html>
