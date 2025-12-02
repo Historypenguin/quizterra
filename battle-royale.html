@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Quizterra | Battle Mode</title>
+<title>Quizterra | Battle Royale</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 body {
@@ -27,7 +27,28 @@ body {
   border-radius: 20px;
   padding: 20px;
   flex-wrap: wrap;
+  position: relative;
 }
+
+.top-icons {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 15px;
+}
+
+.icon-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  font-size: 20px;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.4); }
 
 .left-panel, .right-panel {
   display: flex;
@@ -133,6 +154,11 @@ body {
 <body>
 
 <div class="quiz-container">
+  <!-- Flag button -->
+  <div class="top-icons">
+    <button class="icon-btn" id="endBtn" title="End Battle">🚩</button>
+  </div>
+
   <!-- Left panel: Player & Enemy -->
   <div class="left-panel">
     <div class="player-box">
@@ -171,6 +197,11 @@ body {
 let user = JSON.parse(localStorage.getItem("quizterraUser"));
 if(!user) window.location="login.html";
 
+if(!user.stats) {
+  user.stats = { correct:0, wrong:0 };
+  localStorage.setItem("quizterraUser", JSON.stringify(user));
+}
+
 const sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
 const playerSet = sets.find(s=>s.owner===user.username);
 if(!playerSet) { alert("You need at least one set!"); throw "No set"; }
@@ -200,6 +231,10 @@ const btns = {
   Orange: document.getElementById("btnOrange"),
   Green: document.getElementById("btnGreen"),
   Blue: document.getElementById("btnBlue")
+};
+
+document.getElementById("endBtn").onclick = () => {
+  if(confirm("End battle?")) location.href="stats.html";
 };
 
 function log(msg){ battleLog.innerHTML += msg+"<br>"; battleLog.scrollTop=battleLog.scrollHeight; }
@@ -257,6 +292,13 @@ function nextQuestion(correct, selected){
   enemyHpBar.style.width = enemy.hp+"px";
   enemyHpBar.textContent = enemy.hp;
 
+  // Update Stats
+  let user = JSON.parse(localStorage.getItem("quizterraUser")) || {};
+  if(!user.stats) user.stats = { correct:0, wrong:0 };
+  if(selected === correct) user.stats.correct += 1;
+  else user.stats.wrong += 1;
+  localStorage.setItem("quizterraUser", JSON.stringify(user));
+
   if(selected!==correct) {
     playerHp -= 15;
     if(playerHp<0) playerHp=0;
@@ -265,7 +307,7 @@ function nextQuestion(correct, selected){
     log("❌ Wrong answer! You lose 15 HP.");
   } else log(`✅ Correct! You hit ${enemy.name} for ${dmg} damage.`);
 
-  // Enemy counterattack if alive
+  // Enemy counterattack
   if(enemy.hp>0){
     playerHp -= enemy.attack;
     if(playerHp<0) playerHp=0;
@@ -282,12 +324,9 @@ function nextQuestion(correct, selected){
 
   if(enemy.hp<=0){
     log(`✅ ${enemy.name} defeated!`);
-
-    // Increase player HP by 10 at start of next round
-    playerHp += 10;
+    playerHp += 10; // increase HP each round
     playerHpBar.style.width = playerHp+"px";
     playerHpBar.textContent = playerHp;
-
     currentRound++;
     if(currentRound>=enemyRounds.length){
       log("🏆 You won the battle!");
