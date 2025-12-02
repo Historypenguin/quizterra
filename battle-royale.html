@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quizterra | Battle Mode</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+  font-family: Poppins, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px;
+}
+
+.quiz-container {
+  background: rgba(0,0,0,0.3);
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 700px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.top-icons {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 15px;
+}
+
+.icon-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  font-size: 20px;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.4); }
+
+h2 { text-align: center; font-size: 28px; margin: 0; }
+
+.question-box {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 15px;
+  font-size: 20px;
+  font-weight: 600;
+  min-height: 100px;
+}
+
+.question-box img {
+  max-width: 100%;
+  border-radius: 15px;
+  margin-top: 15px;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.option-btn {
+  padding: 20px;
+  border-radius: 15px;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  border: none;
+  color: white;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.option-btn:hover { transform: scale(1.03); opacity: 0.9; }
+
+.red { background: #e74c3c; }
+.orange { background: #f39c12; }
+.green { background: #27ae60; }
+.blue { background: #2980b9; }
+
+.option-correct { border: 3px solid #28a745 !important; }
+.option-wrong { border: 3px solid #dc3545 !important; }
+
+#enemy-container, #player-container {
+  text-align:center;
+  margin-bottom:20px;
+}
+#enemy-img, #player-img {
+  width:120px; height:120px; border-radius:12px; border:2px solid white; margin-bottom:5px;
+}
+.hp-bar-bg {
+  width:120px; height:15px; background: rgba(255,255,255,0.3); border-radius:10px; margin:auto;
+  overflow:hidden;
+}
+.hp-bar-fill {
+  height:100%; width:100%; background:#0fa6ff; text-align:right; line-height:15px; font-weight:bold;
+  padding-right:5px; transition: width 0.5s;
+}
+
+#battle-log {
+  background: rgba(0,0,0,0.4);
+  padding:15px;
+  border-radius:15px;
+  max-height:200px;
+  overflow-y:auto;
+  font-size:16px;
+}
+</style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <div class="top-icons">
+    <button class="icon-btn" id="endBtn" title="End Battle">🚩</button>
+  </div>
+
+  <h2 id="setTitle">Loading Battle...</h2>
+
+  <!-- Player -->
+  <div id="player-container">
+    <img id="player-img" src="https://i.postimg.cc/2yWnW6sY/wizard.png" alt="Player">
+    <div id="player-name">You</div>
+    <div class="hp-bar-bg"><div class="hp-bar-fill" id="player-hp">100</div></div>
+  </div>
+
+  <!-- Enemy -->
+  <div id="enemy-container">
+    <img id="enemy-img" src="" alt="Enemy">
+    <div id="enemy-name"></div>
+    <div class="hp-bar-bg"><div class="hp-bar-fill" id="enemy-hp">0</div></div>
+  </div>
+
+  <div class="question-box" id="questionBox"></div>
+
+  <div class="options-grid">
+    <button class="option-btn red" id="btnRed"></button>
+    <button class="option-btn orange" id="btnOrange"></button>
+    <button class="option-btn green" id="btnGreen"></button>
+    <button class="option-btn blue" id="btnBlue"></button>
+  </div>
+
+  <div id="battle-log"></div>
+</div>
+
+<script>
+let user = JSON.parse(localStorage.getItem("quizterraUser"));
+if(!user) window.location="login.html";
+
+const sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
+const playerSet = sets.find(s=>s.owner===user.username);
+if(!playerSet) { alert("You need at least one set!"); throw "No set"; }
+
+const enemyRounds = [
+  {name:"Iced Blue Donut", hp:50, attack:8, image:"https://i.postimg.cc/GpCtt1Yq/Iced-Blue-Donut.webp"},
+  {name:"Stary Bot", hp:60, attack:10, image:"https://i.postimg.cc/dt9ZKTVs/staryBot.png"},
+  {name:"Chef", hp:70, attack:9, image:"https://i.postimg.cc/gnxq22bw/chef.png"},
+  {name:"Cat Milk", hp:80, attack:7, image:"https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails%2FcatMilk.png?1750455696008"},
+  {name:"Spooky Bot Ghost", hp:100, attack:15, image:"https://i.postimg.cc/63SV6Tc6/Spooky-Mega-Ghost-1.gif"},
+  {name:"Blooket Warrior", hp:150, attack:20, image:"https://i.postimg.cc/htNhD5Z3/Blooket-Warrior.gif"}
+];
+
+let currentRound = 0;
+let enemy = {...enemyRounds[currentRound]};
+let playerHp = 100;
+let questionTimer;
+
+const enemyImg = document.getElementById("enemy-img");
+const enemyName = document.getElementById("enemy-name");
+const enemyHpBar = document.getElementById("enemy-hp");
+const playerHpBar = document.getElementById("player-hp");
+const questionBox = document.getElementById("questionBox");
+const battleLog = document.getElementById("battle-log");
+const btns = {
+  Red: document.getElementById("btnRed"),
+  Orange: document.getElementById("btnOrange"),
+  Green: document.getElementById("btnGreen"),
+  Blue: document.getElementById("btnBlue")
+};
+
+function log(msg){ battleLog.innerHTML += msg+"<br>"; battleLog.scrollTop=battleLog.scrollHeight; }
+
+function loadEnemy(){
+  enemy = {...enemyRounds[currentRound]};
+  enemyImg.src = enemy.image;
+  enemyName.textContent = enemy.name;
+  enemyHpBar.style.width = enemy.hp+"px";
+  enemyHpBar.textContent = enemy.hp;
+  log(`⚔️ ${enemy.name} appears!`);
+  showQuestion();
+}
+
+function showQuestion(){
+  const q = playerSet.questions[Math.floor(Math.random()*playerSet.questions.length)];
+  questionBox.innerHTML = q.question;
+  if(q.image){
+    const img = document.createElement("img");
+    img.src = q.image;
+    questionBox.appendChild(img);
+  }
+
+  const colors = ["Red","Orange","Green","Blue"];
+  colors.forEach((color,i)=>{
+    const btn = btns[color];
+    btn.textContent = q.options[i]||"";
+    btn.disabled=false;
+    btn.classList.remove("option-correct","option-wrong");
+    btn.onclick = ()=>selectAnswer(btn.textContent,q.correct);
+  });
+
+  clearTimeout(questionTimer);
+  questionTimer = setTimeout(()=>nextQuestion(q.correct,null),15000);
+}
+
+function selectAnswer(selected, correct){
+  nextQuestion(correct, selected);
+}
+
+function nextQuestion(correct, selected){
+  const colors = ["Red","Orange","Green","Blue"];
+  colors.forEach(color=>{
+    const btn = btns[color];
+    btn.disabled=true;
+    if(selected){
+      if(btn.textContent===correct) btn.classList.add("option-correct");
+      if(btn.textContent===selected && selected!==correct) btn.classList.add("option-wrong");
+    }
+  });
+
+  let dmg = (selected===correct?20:0);
+  enemy.hp -= dmg;
+  if(enemy.hp<0) enemy.hp=0;
+  enemyHpBar.style.width = enemy.hp+"px";
+  enemyHpBar.textContent = enemy.hp;
+
+  if(selected!==correct) {
+    playerHp -= 15;
+    if(playerHp<0) playerHp=0;
+    playerHpBar.style.width = playerHp+"px";
+    playerHpBar.textContent = playerHp;
+    log("❌ Wrong answer! You lose 15 HP.");
+  } else log(`✅ Correct! You hit ${enemy.name} for ${dmg} damage.`);
+
+  // Enemy counterattack if alive
+  if(enemy.hp>0){
+    playerHp -= enemy.attack;
+    if(playerHp<0) playerHp=0;
+    playerHpBar.style.width = playerHp+"px";
+    playerHpBar.textContent = playerHp;
+    log(`${enemy.name} attacks you for ${enemy.attack} damage.`);
+  }
+
+  if(playerHp<=0){
+    log("💀 You were defeated!");
+    Object.values(btns).forEach(b=>b.disabled=true);
+    return;
+  }
+
+  if(enemy.hp<=0){
+    log(`✅ ${enemy.name} defeated!`);
+    currentRound++;
+    if(currentRound>=enemyRounds.length){
+      log("🏆 You won the battle!");
+      return;
+    }
+    setTimeout(loadEnemy,1500);
+    return;
+  }
+
+  setTimeout(showQuestion,1000);
+}
+
+document.getElementById("endBtn").onclick=()=>{ if(confirm("End battle?")) location.href="stats.html"; }
+
+loadEnemy();
+</script>
+</body>
+</html>
