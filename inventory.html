@@ -1,95 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quizterra | Inventory</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <style>
-    :root{--sidebar-width:260px;}
-    html,body{height:100%;margin:0;padding:0}
-    body{margin:0;font-family:Poppins,sans-serif;display:flex;min-height:100vh;background:linear-gradient(120deg,#47a7ff,#745cff,#ff4ef2);background-size:400% 400%;animation:gradientMove 11s ease infinite;color:white;}
-    @keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    
-    /* Sidebar */
-    .sidebar{width:var(--sidebar-width);background:#002b6f;padding:25px;height:100vh;box-shadow:2px 0 10px rgba(0,0,0,0.4);box-sizing:border-box;position:fixed;left:0;top:0}
-    .sidebar h2{font-size:40px;margin-bottom:35px;color:#0fa6ff;font-weight:900;letter-spacing:1px}
-    .sidebar a{display:flex;align-items:center;gap:14px;text-decoration:none;color:white;font-size:22px;font-weight:700;padding:12px 15px;border-radius:12px;margin-bottom:18px;transition:0.25s;cursor:pointer}
-    .sidebar a i{font-size:24px}
-    .sidebar a:hover{background:rgba(255,255,255,0.15)}
-    .sidebar a.active{background:rgba(255,255,255,0.2)}
+    body {
+      font-family: Poppins, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+    }
 
-    /* Main */
-    .main{margin-left:var(--sidebar-width);padding:50px;flex:1;box-sizing:border-box}
-    .user-info{display:flex;align-items:center;gap:20px;margin-bottom:24px}
-    .user-info img{width:80px;height:80px;border-radius:50%;border:2px solid white;object-fit:cover}
-    .user-info h2{font-size:28px;font-weight:700;margin:0}
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: rgba(0,0,0,0.7);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar h2 {
+      margin-top: 0;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .sidebar a {
+      display: block;
+      color: #fff;
+      text-decoration: none;
+      margin: 12px 0;
+      font-weight: 600;
+    }
+
+    /* Main content */
+    .main {
+      margin-left: 240px;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
 
     /* Inventory grid */
-    .blook-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:18px;margin-top:24px;align-items:start}
-    .blook-card{background:rgba(255,255,255,0.08);border-radius:12px;padding:10px;text-align:center;box-shadow:0 8px 18px rgba(0,0,0,0.2)}
-    .blook-card img{width:100px;height:100px;border-radius:10px;object-fit:cover;margin:0 auto}
-    .rarity-common{}
-    .rarity-uncommon{box-shadow:0 0 18px rgba(84,255,168,0.12)}
-    .rarity-rare{box-shadow:0 0 22px rgba(66,133,255,0.14)}
-    .rarity-epic{box-shadow:0 0 26px rgba(169,84,255,0.18)}
-    .rarity-legendary{box-shadow:0 0 34px rgba(255,200,0,0.22)}
-    .rarity-chroma{box-shadow:0 0 40px rgba(255,80,200,0.26)}
-    .rarity-mystical{box-shadow:0 0 48px rgba(0,255,200,0.28)}
-    .rarity-heavenly{box-shadow:0 0 56px rgba(255,255,255,0.35)}
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
+    }
+
+    .blook-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .blook-card:hover {
+      transform: scale(1.05);
+    }
+
+    .blook-card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .rarity-common { border: 2px solid #aaa; }
+    .rarity-rare { border: 2px solid #00f; }
+    .rarity-epic { border: 2px solid #a0f; }
+    .rarity-legendary { border: 2px solid #ff0; }
+    .rarity-chroma { border: 2px solid #0ff; }
+
+    .blook-name {
+      margin-top: 8px;
+      font-weight: 700;
+    }
+
   </style>
 </head>
 <body>
+
   <div class="sidebar">
-    <h2>QUIZTERRA</h2>
-    <a href="stats.html"><i class="fas fa-chart-line"></i> Stats</a>
-    <a href="market.html"><i class="fas fa-store"></i> Market</a>
-    <a href="inventory.html" class="active"><i class="fas fa-box"></i> Inventory</a>
-    <a href="sets.html"><i class="fas fa-layer-group"></i> Sets</a>
-    <a id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    <h2>Quizterra</h2>
+    <a href="market.html"><i class="fa-solid fa-store"></i> Market</a>
+    <a href="inventory.html"><i class="fa-solid fa-box"></i> Inventory</a>
+    <a href="stats.html"><i class="fa-solid fa-chart-line"></i> Stats</a>
   </div>
 
   <div class="main">
-    <div class="user-info">
-      <img id="profilePic" src="" alt="Profile">
-      <h2 id="username">USERNAME</h2>
+    <h1>Your Inventory</h1>
+    <div class="inventory-grid" id="blook-display">
+      <!-- Blooks will populate here -->
     </div>
-
-    <h1>Inventory</h1>
-    <div class="blook-grid" id="inventoryGrid"></div>
   </div>
 
   <script>
-    function getUser(){return JSON.parse(localStorage.getItem('quizterraUser'));}
-    function saveUser(user){localStorage.setItem('quizterraUser',JSON.stringify(user));}
-    function ensureUser(){let u=getUser();if(!u){u={username:"Guest",picture:"",stats:{level:0,xp:0,coins:0,gamesPlayed:0,correct:0,wrong:0,lastClaim:null},inventory:[]};saveUser(u);}return getUser();}
+    // Function to get or create user data
+    function ensureUser() {
+      let user = JSON.parse(localStorage.getItem('quizterraUser'));
+      if(!user) {
+        user = { inventory: [] };
+        localStorage.setItem('quizterraUser', JSON.stringify(user));
+      }
+      return user;
+    }
 
-    const user = ensureUser();
-    document.getElementById('username').innerText = user.username || "UNKNOWN";
-    document.getElementById('profilePic').src = user.picture || "https://i.postimg.cc/0jz2q0qY/default-avatar.png";
+    // Save user data
+    function saveUser(user) {
+      localStorage.setItem('quizterraUser', JSON.stringify(user));
+    }
 
-    document.getElementById('logoutBtn').onclick = ()=>{localStorage.removeItem('quizterraUser'); window.location.href='login.html';};
+    // Save pulled blooks (call this when opening packs)
+    function savePulledBlooks(newBlooks) {
+      const user = ensureUser();
+      user.inventory = user.inventory || [];
+      newBlooks.forEach(b => {
+        if(!user.inventory.find(x => x.name === b.name)) {
+          user.inventory.push(b);
+        }
+      });
+      saveUser(user);
+    }
 
-    const inventoryGrid = document.getElementById('inventoryGrid');
+    // Display only owned blooks
+    function displayInventory() {
+      const grid = document.getElementById('blook-display');
+      grid.innerHTML = '';
+      const user = ensureUser();
+      const owned = user.inventory || [];
 
-    function renderInventory(){
-      inventoryGrid.innerHTML = '';
-      const inv = user.inventory || [];
-      if(inv.length===0){
-        inventoryGrid.innerHTML = '<p style="color:white;font-weight:700;">No blooks yet! Open some packs in the Market.</p>';
+      if(owned.length === 0) {
+        grid.innerHTML = '<p>You haven\'t pulled any blooks yet!</p>';
         return;
       }
-      inv.forEach(b=>{
+
+      owned.forEach(b => {
         const card = document.createElement('div');
-        card.className = 'blook-card rarity-' + (b.rarity||'common');
-        card.innerHTML = `<img src="${b.img}" alt="${b.name}"><div style="margin-top:6px;font-weight:700">${b.name}</div>`;
-        inventoryGrid.appendChild(card);
+        card.className = 'blook-card';
+        const rarityClass = 'rarity-' + (b.rarity || 'common');
+        card.innerHTML = `
+          <div class="${rarityClass}" style="overflow:hidden; border-radius:10px;">
+            <img src="${b.img}" alt="${b.name}">
+          </div>
+          <div class="blook-name">${b.name}</div>
+        `;
+        grid.appendChild(card);
       });
     }
 
-    renderInventory();
+    // Load inventory on page load
+    displayInventory();
   </script>
+
 </body>
 </html>
