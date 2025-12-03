@@ -4,300 +4,342 @@
 <meta charset="UTF-8">
 <title>Quizterra | Battle Royale</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
-  body {
-    margin: 0;
-    font-family: Poppins, sans-serif;
-    background: linear-gradient(135deg, #47a7ff, #745cff, #ff4ef2);
-    background-size: 400% 400%;
-    animation: gradientMove 11s ease infinite;
-    color: white;
-    text-align: center;
-    padding: 30px;
-  }
+body {
+  font-family: Poppins, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
 
-  @keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
+.quiz-container {
+  display: flex;
+  gap: 30px;
+  max-width: 1000px;
+  width: 100%;
+  margin: auto;
+  background: rgba(0,0,0,0.3);
+  border-radius: 20px;
+  padding: 20px;
+  flex-wrap: wrap;
+  position: relative;
+}
 
-  h1 {
-    font-size: 50px;
-    font-weight: 900;
-    margin-bottom: 20px;
-  }
+.top-icons {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 15px;
+}
 
-  #flag {
-    width: 70px;
-    margin-bottom: 20px;
-  }
+.icon-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  font-size: 20px;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.4); }
 
-  #battleLog {
-    margin-top: 25px;
-    background: rgba(0,0,0,0.25);
-    padding: 15px;
-    height: 160px;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 15px;
-    overflow-y: auto;
-    text-align: left;
-  }
+.left-panel, .right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
 
-  .hp-container {
-    width: 80%;
-    margin: auto;
-    margin-bottom: 20px;
-  }
+.left-panel {
+  flex: 1;
+  align-items: center;
+}
 
-  .hp-bar {
-    width: 100%;
-    height: 30px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
+.right-panel {
+  flex: 2;
+}
 
-  .hp-fill {
-    height: 100%;
-    background: #0fa6ff;
-    width: 100px;
-    text-align: center;
-    line-height: 30px;
-    font-weight: 700;
-    transition: width 0.3s;
-  }
+.player-box, .enemy-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  #questionBox {
-    margin-top: 25px;
-    font-size: 28px;
-    font-weight: 700;
-  }
+.hp-bar-bg {
+  width: 150px;
+  height: 15px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 10px;
+  margin-top: 5px;
+  overflow: hidden;
+}
 
-  .options {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
+.hp-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: #0fa6ff;
+  text-align: right;
+  line-height: 15px;
+  font-weight: bold;
+  padding-right: 5px;
+  transition: width 0.5s;
+}
 
-  .opt-btn {
-    padding: 15px 25px;
-    font-size: 20px;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: 0.3s;
-  }
+.question-box {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 15px;
+  font-size: 20px;
+  font-weight: 600;
+  min-height: 120px;
+}
 
-  .option-correct {
-    background: #00ff88 !important;
-    color: black !important;
-  }
+.question-box img {
+  max-width: 100%;
+  border-radius: 15px;
+  margin-top: 15px;
+}
 
-  .option-wrong {
-    background: #ff4444 !important;
-    color: black !important;
-  }
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.option-btn {
+  padding: 20px;
+  border-radius: 15px;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  border: none;
+  color: white;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.option-btn:hover { transform: scale(1.03); opacity: 0.9; }
+
+.red { background: #e74c3c; }
+.orange { background: #f39c12; }
+.green { background: #27ae60; }
+.blue { background: #2980b9; }
+
+.option-correct { border: 3px solid #28a745 !important; }
+.option-wrong { border: 3px solid #dc3545 !important; }
+
+#battle-log {
+  background: rgba(0,0,0,0.4);
+  padding: 15px;
+  border-radius: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 16px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+#player-img, #enemy-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  border: 2px solid white;
+}
 </style>
 </head>
-
 <body>
 
-<h1>BATTLE ROYALE</h1>
-<img id="flag" src="https://flagsapi.com/US/flat/64.png">
+<div class="quiz-container">
+  <!-- Flag button -->
+  <div class="top-icons">
+    <button class="icon-btn" id="endBtn" title="End Battle">🚩</button>
+  </div>
 
-<div class="hp-container">
-  <h3>Your HP</h3>
-  <div class="hp-bar"><div id="playerHpBar" class="hp-fill">100</div></div>
+  <!-- Left panel: Player & Enemy -->
+  <div class="left-panel">
+    <div class="player-box">
+      <img id="player-img" src="https://i.postimg.cc/2yWnW6sY/wizard.png" alt="Player">
+      <div id="player-name">You</div>
+      <div class="hp-bar-bg"><div class="hp-bar-fill" id="player-hp">100</div></div>
+    </div>
 
-  <h3 id="enemyName">Enemy</h3>
-  <div class="hp-bar"><div id="enemyHpBar" class="hp-fill">50</div></div>
+    <div class="enemy-box">
+      <img id="enemy-img" src="" alt="Enemy">
+      <div id="enemy-name"></div>
+      <div class="hp-bar-bg"><div class="hp-bar-fill" id="enemy-hp">0</div></div>
+    </div>
+  </div>
+
+  <!-- Right panel: Question & Options -->
+  <div class="right-panel">
+    <h2 id="setTitle">Loading Battle...</h2>
+    <div class="question-box" id="questionBox"></div>
+
+    <div class="options-grid">
+      <button class="option-btn red" id="btnRed"></button>
+      <button class="option-btn orange" id="btnOrange"></button>
+      <button class="option-btn green" id="btnGreen"></button>
+      <button class="option-btn blue" id="btnBlue"></button>
+    </div>
+  </div>
+
+  <!-- Battle log -->
+  <div style="width:100%;">
+    <div id="battle-log"></div>
+  </div>
 </div>
-
-<div id="questionBox">Loading question...</div>
-
-<div class="options">
-  <button class="opt-btn" id="Red">Red</button>
-  <button class="opt-btn" id="Orange">Orange</button>
-  <button class="opt-btn" id="Green">Green</button>
-  <button class="opt-btn" id="Blue">Blue</button>
-</div>
-
-<div id="battleLog"></div>
 
 <script>
-// ====== PLAYER & ENEMY SETTINGS ======
+let user = JSON.parse(localStorage.getItem("quizterraUser"));
+if(!user) window.location="login.html";
 
-let playerHp = 100;
-const maxHp = 100;
-
-const enemyRounds = [
-  { name:"Round 1", hp:50, attack:10 },
-  { name:"Round 2", hp:60, attack:12 },
-  { name:"Round 3", hp:70, attack:14 },
-  { name:"Round 4", hp:80, attack:16 },
-  { name:"Round 5", hp:100, attack:18 },
-  { name:"Round 6", hp:150, attack:20 }
-];
-
-let currentRound = 0;
-let enemy = null;
-
-// ====== BUTTON REFERENCES ======
-
-const btns = {
-  "Red": document.getElementById("Red"),
-  "Orange": document.getElementById("Orange"),
-  "Green": document.getElementById("Green"),
-  "Blue": document.getElementById("Blue")
-};
-
-// ====== LOG FUNCTION ======
-
-function log(msg){
-  let box = document.getElementById("battleLog");
-  box.innerHTML += msg + "<br>";
-  box.scrollTop = box.scrollHeight;
-}
-
-// ====== LOAD NEW ENEMY ======
-
-function loadEnemy(){
-  enemy = JSON.parse(JSON.stringify(enemyRounds[currentRound]));
-
-  document.getElementById("enemyName").innerText = enemy.name;
-
-  document.getElementById("enemyHpBar").style.width = enemy.hp + "px";
-  document.getElementById("enemyHpBar").textContent = enemy.hp;
-
-  // Reset player HP every round
-  playerHp = 100;
-  document.getElementById("playerHpBar").style.width = "100px";
-  document.getElementById("playerHpBar").textContent = "100";
-
-  log(`🔥 New Round: ${enemy.name}`);
-
-  showQuestion();
-}
-
-// ====== QUESTIONS ======
-
-function randomQuestion(){
-  const questions = [
-    { q:"What color is the sky?", answer:"Blue" },
-    { q:"What color is fire?", answer:"Red" },
-    { q:"What color is grass?", answer:"Green" },
-    { q:"Which is a fruit color?", answer:"Orange" }
-  ];
-  return questions[Math.floor(Math.random()*questions.length)];
-}
-
-// ====== SHOW QUESTION ======
-
-function showQuestion(){
-  const data = randomQuestion();
-  currentCorrect = data.answer;
-  document.getElementById("questionBox").innerText = data.q;
-
-  Object.values(btns).forEach(btn=>{
-    btn.disabled = false;
-    btn.classList.remove("option-correct","option-wrong");
-  });
-}
-
-let currentCorrect = "";
-
-// ====== SAVE STATS ======
-
-function saveStat(correct){
-  let user = JSON.parse(localStorage.getItem("quizterraUser")) || {};
-  if(!user.stats) user.stats = { correct:0, wrong:0 };
-
-  if(correct) user.stats.correct++;
-  else user.stats.wrong++;
-
+if(!user.stats) {
+  user.stats = { correct:0, wrong:0 };
   localStorage.setItem("quizterraUser", JSON.stringify(user));
 }
 
-// ====== BUTTON CLICK LOGIC ======
+const sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
+const playerSet = sets.find(s=>s.owner===user.username);
+if(!playerSet) { alert("You need at least one set!"); throw "No set"; }
 
-Object.keys(btns).forEach(id=>{
-  btns[id].onclick = () => nextQuestion(currentCorrect, id);
-});
+const enemyRounds = [
+  {name:"Iced Blue Donut", hp:50, attack:8, image:"https://i.postimg.cc/GpCtt1Yq/Iced-Blue-Donut.webp"},
+  {name:"Stary Bot", hp:60, attack:10, image:"https://i.postimg.cc/dt9ZKTVs/staryBot.png"},
+  {name:"Chef", hp:70, attack:9, image:"https://i.postimg.cc/gnxq22bw/chef.png"},
+  {name:"Cat Milk", hp:80, attack:7, image:"https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails%2FcatMilk.png?1750455696008"},
+  {name:"Spooky Bot Ghost", hp:100, attack:15, image:"https://i.postimg.cc/63SV6Tc6/Spooky-Mega-Ghost-1.gif"},
+  {name:"Blooket Warrior", hp:150, attack:20, image:"https://i.postimg.cc/htNhD5Z3/Blooket-Warrior.gif"}
+];
 
-// ====== MAIN QUESTION HANDLER ======
+let currentRound = 0;
+let enemy = {...enemyRounds[currentRound]};
+let playerHp = 100;
+let questionTimer;
 
-function nextQuestion(correct, picked){
+const enemyImg = document.getElementById("enemy-img");
+const enemyName = document.getElementById("enemy-name");
+const enemyHpBar = document.getElementById("enemy-hp");
+const playerHpBar = document.getElementById("player-hp");
+const questionBox = document.getElementById("questionBox");
+const battleLog = document.getElementById("battle-log");
+const btns = {
+  Red: document.getElementById("btnRed"),
+  Orange: document.getElementById("btnOrange"),
+  Green: document.getElementById("btnGreen"),
+  Blue: document.getElementById("btnBlue")
+};
 
-  // lock all buttons
-  Object.values(btns).forEach(b => b.disabled = true);
+document.getElementById("endBtn").onclick = () => {
+  if(confirm("End battle?")) location.href="stats.html";
+};
 
-  // Mark correct & wrong buttons
-  Object.values(btns).forEach(btn=>{
-    if(btn.textContent===correct) btn.classList.add("option-correct");
-    if(btn.textContent===picked && picked!==correct) btn.classList.add("option-wrong");
-  });
+function log(msg){ battleLog.innerHTML += msg+"<br>"; battleLog.scrollTop=battleLog.scrollHeight; }
 
-  // Update stats (correct/wrong answers)
-  saveStat(picked===correct);
-
-  // PLAYER did damage?
-  if(picked === correct){
-    enemy.hp -= 20;
-    log(`✅ Correct! You deal 20 damage.`);
-  } else {
-    playerHp -= 15;
-    log(`❌ Wrong! You lose 15 HP.`);
-  }
-
-  // ENEMY counter attack if alive
-  if(enemy.hp > 0){
-    playerHp -= enemy.attack;
-    log(`⚔️ Enemy hits you for ${enemy.attack}.`);
-  }
-
-  // Update bars
-  if(enemy.hp < 0) enemy.hp = 0;
-  document.getElementById("enemyHpBar").style.width = enemy.hp+"px";
-  document.getElementById("enemyHpBar").textContent = enemy.hp;
-
-  if(playerHp < 0) playerHp = 0;
-  document.getElementById("playerHpBar").style.width = playerHp+"px";
-  document.getElementById("playerHpBar").textContent = playerHp;
-
-  // Check defeat
-  if(playerHp <= 0){
-    log("💀 You lost...");
-    return;
-  }
-
-  // Check enemy defeat
-  if(enemy.hp <= 0){
-    log(`🏆 ${enemy.name} defeated!`);
-
-    currentRound++;
-    if(currentRound >= enemyRounds.length){
-      log("🎉 YOU WIN THE BATTLE ROYALE!");
-      return;
-    }
-
-    setTimeout(loadEnemy, 1500);
-    return;
-  }
-
-  setTimeout(showQuestion, 1000);
+function loadEnemy(){
+  enemy = {...enemyRounds[currentRound]};
+  enemyImg.src = enemy.image;
+  enemyName.textContent = enemy.name;
+  enemyHpBar.style.width = enemy.hp+"px";
+  enemyHpBar.textContent = enemy.hp;
+  log(`⚔️ ${enemy.name} appears!`);
+  showQuestion();
 }
 
-// ====== START GAME ======
+function showQuestion(){
+  const q = playerSet.questions[Math.floor(Math.random()*playerSet.questions.length)];
+  questionBox.innerHTML = q.question;
+  if(q.image){
+    const img = document.createElement("img");
+    img.src = q.image;
+    questionBox.appendChild(img);
+  }
+
+  const colors = ["Red","Orange","Green","Blue"];
+  colors.forEach((color,i)=>{
+    const btn = btns[color];
+    btn.textContent = q.options[i]||"";
+    btn.disabled=false;
+    btn.classList.remove("option-correct","option-wrong");
+    btn.onclick = ()=>selectAnswer(btn.textContent,q.correct);
+  });
+
+  clearTimeout(questionTimer);
+  questionTimer = setTimeout(()=>nextQuestion(q.correct,null),15000);
+}
+
+function selectAnswer(selected, correct){
+  nextQuestion(correct, selected);
+}
+
+function nextQuestion(correct, selected){
+  const colors = ["Red","Orange","Green","Blue"];
+  colors.forEach(color=>{
+    const btn = btns[color];
+    btn.disabled=true;
+    if(selected){
+      if(btn.textContent===correct) btn.classList.add("option-correct");
+      if(btn.textContent===selected && selected!==correct) btn.classList.add("option-wrong");
+    }
+  });
+
+  let dmg = (selected===correct?20:0);
+  enemy.hp -= dmg;
+  if(enemy.hp<0) enemy.hp=0;
+  enemyHpBar.style.width = enemy.hp+"px";
+  enemyHpBar.textContent = enemy.hp;
+
+  // Update Stats
+  let user = JSON.parse(localStorage.getItem("quizterraUser")) || {};
+  if(!user.stats) user.stats = { correct:0, wrong:0 };
+  if(selected === correct) user.stats.correct += 1;
+  else user.stats.wrong += 1;
+  localStorage.setItem("quizterraUser", JSON.stringify(user));
+
+  if(selected!==correct) {
+    playerHp -= 15;
+    if(playerHp<0) playerHp=0;
+    playerHpBar.style.width = playerHp+"px";
+    playerHpBar.textContent = playerHp;
+    log("❌ Wrong answer! You lose 15 HP.");
+  } else log(`✅ Correct! You hit ${enemy.name} for ${dmg} damage.`);
+
+  // Enemy counterattack
+  if(enemy.hp>0){
+    playerHp -= enemy.attack;
+    if(playerHp<0) playerHp=0;
+    playerHpBar.style.width = playerHp+"px";
+    playerHpBar.textContent = playerHp;
+    log(`${enemy.name} attacks you for ${enemy.attack} damage.`);
+  }
+
+  if(playerHp<=0){
+    log("💀 You were defeated!");
+    Object.values(btns).forEach(b=>b.disabled=true);
+    return;
+  }
+
+  if(enemy.hp<=0){
+    log(`✅ ${enemy.name} defeated!`);
+    playerHp += 10; // increase HP each round
+    playerHpBar.style.width = playerHp+"px";
+    playerHpBar.textContent = playerHp;
+    currentRound++;
+    if(currentRound>=enemyRounds.length){
+      log("🏆 You won the battle!");
+      return;
+    }
+    setTimeout(loadEnemy,1500);
+    return;
+  }
+
+  setTimeout(showQuestion,1000);
+}
 
 loadEnemy();
-
 </script>
 </body>
 </html>
