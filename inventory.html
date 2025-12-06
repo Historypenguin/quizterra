@@ -19,9 +19,12 @@ body{font-family:Poppins,sans-serif;margin:0;background:linear-gradient(120deg,#
 .user-info{display:flex;align-items:center;gap:20px;margin-bottom:24px;}
 .user-info img{width:80px;height:80px;border-radius:50%;border:2px solid white;object-fit:cover;}
 .user-info h2{font-size:28px;font-weight:700;margin:0;}
+.wallet{margin-left:auto;font-size:22px;font-weight:700;color:#ffd700;}
 .blook-grid{display:flex;flex-wrap:wrap;gap:14px;margin-top:24px;align-items:flex-start;}
-.blook-card{width:120px;background:rgba(255,255,255,0.08);border-radius:12px;padding:8px;text-align:center;box-shadow:0 8px 18px rgba(0,0,0,0.2);}
+.blook-card{width:140px;background:rgba(255,255,255,0.08);border-radius:12px;padding:8px;text-align:center;box-shadow:0 8px 18px rgba(0,0,0,0.2);}
 .blook-card img{width:100px;height:100px;border-radius:10px;object-fit:cover;display:block;margin:0 auto;}
+.blook-card button{margin-top:6px;padding:4px 8px;border:none;border-radius:6px;background:#ff4e4e;color:white;cursor:pointer;font-weight:700;}
+.blook-card button:hover{background:#ff1e1e;}
 </style>
 </head>
 <body>
@@ -38,26 +41,102 @@ body{font-family:Poppins,sans-serif;margin:0;background:linear-gradient(120deg,#
   <div class="user-info">
     <img id="profilePic" src="" alt="Profile">
     <h2 id="username">USERNAME</h2>
+    <div class="wallet">Coins: <span id="wallet">0</span></div>
   </div>
   <h1>Your Inventory</h1>
   <div class="blook-grid" id="inventory-grid"></div>
 </div>
 
 <script>
-function getUser(){ return JSON.parse(localStorage.getItem('quizterraUser')); }
-const user = getUser()||{username:"Guest",picture:"",inventory:[]};
+function getUser(){ 
+    return JSON.parse(localStorage.getItem('quizterraUser')); 
+}
+
+function saveUser(user) {
+    localStorage.setItem('quizterraUser', JSON.stringify(user));
+}
+
+const user = getUser() || {username:"Guest", picture:"", inventory:[], coins:0};
 document.getElementById('username').innerText = user.username;
 document.getElementById('profilePic').src = user.picture || "https://i.postimg.cc/0jz2q0qY/default-avatar.png";
+document.getElementById('wallet').innerText = user.coins || 0;
 
-document.getElementById('logoutBtn').onclick = ()=>{ localStorage.removeItem('quizterraUser'); window.location.href='login.html'; }
+document.getElementById('logoutBtn').onclick = () => { 
+    localStorage.removeItem('quizterraUser'); 
+    window.location.href='login.html'; 
+}
 
-const grid=document.getElementById('inventory-grid');
-user.inventory.forEach(b=>{
-  const card=document.createElement('div');
-  card.className='blook-card';
-  card.innerHTML=`<div style="border-radius:10px;overflow:hidden"><img src="${b.img}" alt="${b.name}"></div><div style="margin-top:6px;font-weight:700">${b.name}</div>`;
-  grid.appendChild(card);
-});
+// Define coin values by rarity
+const rarityCoins = {
+    uncommon: 5,
+    rare: 10,
+    epic: 20,
+    legendary: 30,
+    chroma: 50,
+    unique: 70,
+    mystical: 100,
+    heavenly: 150
+};
+
+// Group inventory by blook name
+function groupInventory(inventory) {
+    const grouped = {};
+    inventory.forEach(b => {
+        if (grouped[b.name]) {
+            grouped[b.name].count += 1;
+        } else {
+            grouped[b.name] = {...b, count: 1};
+        }
+    });
+    return Object.values(grouped);
+}
+
+const grid = document.getElementById('inventory-grid');
+
+function renderInventory() {
+    grid.innerHTML = "";
+    const groupedInventory = groupInventory(user.inventory);
+
+    groupedInventory.forEach(b => {
+        const card = document.createElement('div');
+        card.className = 'blook-card';
+        card.innerHTML = `
+            <div style="border-radius:10px;overflow:hidden">
+                <img src="${b.img}" alt="${b.name}">
+            </div>
+            <div style="margin-top:6px;font-weight:700">
+                ${b.name} ${b.count > 1 ? `(${b.count}x)` : ""}
+            </div>
+            <button>Sell</button>
+        `;
+
+        card.querySelector('button').onclick = () => {
+            const maxSell = b.count;
+            let quantity = prompt(`You have ${b.count} of "${b.name}". How many do you want to sell? (1-${maxSell})`, "1");
+            quantity = parseInt(quantity);
+            if(quantity > 0 && quantity <= maxSell){
+                const coinsEarned = (rarityCoins[b.rarity] || 10) * quantity;
+                if(confirm(`Sell ${quantity}x ${b.name} for ${coinsEarned} coins?`)) {
+                    for(let i=0;i<quantity;i++){
+                        const index = user.inventory.findIndex(item => item.name === b.name);
+                        if(index > -1) user.inventory.splice(index,1);
+                    }
+                    user.coins = (user.coins || 0) + coinsEarned;
+                    document.getElementById('wallet').innerText = user.coins;
+                    saveUser(user);
+                    renderInventory();
+                }
+            } else if(quantity !== null){
+                alert("Invalid quantity entered.");
+            }
+        };
+
+        grid.appendChild(card);
+    });
+}
+
+// Initial render
+renderInventory();
 </script>
 </body>
 </html>
