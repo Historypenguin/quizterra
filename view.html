@@ -151,7 +151,12 @@ shareBtn.onclick = () => {
 };
 
 copyBtn.onclick = () => {
-  navigator.clipboard.writeText(shareInput.value);
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(shareInput.value);
+  } else {
+    shareInput.select();
+    document.execCommand('copy');
+  }(shareInput.value);
   copyBtn.innerText = "Copied!";
   setTimeout(() => { copyBtn.innerText = "Copy"; }, 1200);
 };
