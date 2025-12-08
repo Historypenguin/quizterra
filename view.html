@@ -110,8 +110,9 @@
       const toggleBtn = document.getElementById("togglePrivacy");
 
       function updatePrivacyText() {
-        privacyStatus.innerText = "Privacy: " + (setData.private ? "Private" : "Public");
+        privacyStatus.innerText = "Privacy: " + ((setData.private === undefined ? false : setData.private) ? "Private" : "Public");
       }
+      if (setData.private === undefined) { setData.private = false; }
       updatePrivacyText();
 
       toggleBtn.onclick = () => {
