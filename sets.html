@@ -127,6 +127,9 @@
     .play-btn { background: #00ff95; color: black; }
     .play-btn:hover { background: #33ffaa; transform: scale(1.05); }
 
+    .view-btn { background: #4ecbff; color: black; }
+    .view-btn:hover { background: #7edaff; transform: scale(1.05); }
+
     /* Create Set Form */
     #createSetForm {
       display: none;
@@ -137,12 +140,14 @@
       backdrop-filter: blur(10px);
       box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     }
+
     .question-block {
       background: rgba(0,0,0,0.2);
       padding: 15px;
       border-radius: 14px;
       margin-bottom: 20px;
     }
+
     input, textarea, select {
       width: 100%;
       padding: 10px;
@@ -151,17 +156,6 @@
       border: none;
       font-size: 16px;
     }
-    #createSetForm button {
-      background: #00ff95;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      font-weight: 700;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    #createSetForm button:hover { transform: scale(1.05); }
   </style>
 </head>
 
@@ -187,6 +181,14 @@
       <h2>Create New Set</h2>
 
       <input type="text" id="setName" placeholder="Set Name">
+
+      <!-- NEW: Privacy -->
+      <label style="font-weight:700;">Privacy</label>
+      <select id="setPrivacy">
+        <option value="public">Public</option>
+        <option value="unlisted">Unlisted</option>
+        <option value="private">Private</option>
+      </select>
 
       <div id="questionsContainer"></div>
 
@@ -216,14 +218,21 @@ function loadSets() {
   }
 
   mySets.forEach(set => {
+    const shareBtn = 
+      set.privacy !== "private"
+        ? `<button class="view-btn" onclick="viewSet('${set.id}')">View / Share</button>`
+        : "";
+
     container.innerHTML += `
       <div class="set-card">
         <h3>${set.name}</h3>
         <p>${set.questions.length} Questions</p>
+        <p><strong>Privacy:</strong> ${set.privacy}</p>
         <div class="card-btns">
           <button class="edit-btn" onclick="editSet('${set.id}')">Edit</button>
           <button class="delete-btn" onclick="deleteSet('${set.id}')">Delete</button>
           <button class="play-btn" onclick="playSet('${set.id}')">Play</button>
+          ${shareBtn}
         </div>
       </div>
     `;
@@ -237,7 +246,7 @@ function toggleCreateForm() {
       : "none";
 }
 
-// --- NEW FUNCTION: Update dropdown options dynamically ---
+// Update dropdown
 function updateCorrectDropdown(block) {
   const select = block.querySelector(".q-correct");
   const opts = [
@@ -272,7 +281,6 @@ function addQuestion() {
   container.insertAdjacentHTML("beforeend", html);
   const block = container.lastElementChild;
 
-  // Update dropdown whenever options change
   block.querySelectorAll(".opt1, .opt2, .opt3, .opt4").forEach(input => {
     input.addEventListener("input", () => updateCorrectDropdown(block));
   });
@@ -281,29 +289,30 @@ function addQuestion() {
 // Create set
 function createSet() {
   const name = document.getElementById("setName").value.trim();
+  const privacy = document.getElementById("setPrivacy").value;
+
   if (!name) return alert("Enter a set name.");
 
   const blocks = [...document.querySelectorAll(".question-block")];
   if (blocks.length === 0) return alert("Add at least one question.");
 
-  const questionData = blocks.map(block => {
-    return {
-      question: block.querySelector(".q-text").value.trim(),
-      image: block.querySelector(".q-img").value.trim(),
-      options: [
-        block.querySelector(".opt1").value.trim(),
-        block.querySelector(".opt2").value.trim(),
-        block.querySelector(".opt3").value.trim(),
-        block.querySelector(".opt4").value.trim()
-      ],
-      correct: block.querySelector(".q-correct").value
-    };
-  });
+  const questionData = blocks.map(block => ({
+    question: block.querySelector(".q-text").value.trim(),
+    image: block.querySelector(".q-img").value.trim(),
+    options: [
+      block.querySelector(".opt1").value.trim(),
+      block.querySelector(".opt2").value.trim(),
+      block.querySelector(".opt3").value.trim(),
+      block.querySelector(".opt4").value.trim()
+    ],
+    correct: block.querySelector(".q-correct").value
+  }));
 
   const newSet = {
     id: Date.now().toString(),
     name,
     owner: user.username,
+    privacy,
     questions: questionData
   };
 
@@ -322,24 +331,28 @@ function editSet(id) {
   toggleCreateForm();
 
   document.getElementById("setName").value = set.name;
+  document.getElementById("setPrivacy").value = set.privacy;
+
   const container = document.getElementById("questionsContainer");
   container.innerHTML = ""; 
 
   set.questions.forEach(q => {
     const html = `
       <div class="question-block">
-        <input type="text" class="q-text" placeholder="Question Text" value="${q.question}">
-        <input type="text" class="q-img" placeholder="Image/GIF URL (optional)" value="${q.image}">
-        <input type="text" class="opt1" placeholder="Option 1" value="${q.options[0]}">
-        <input type="text" class="opt2" placeholder="Option 2" value="${q.options[1]}">
-        <input type="text" class="opt3" placeholder="Option 3" value="${q.options[2]}">
-        <input type="text" class="opt4" placeholder="Option 4" value="${q.options[3]}">
+        <input type="text" class="q-text" value="${q.question}">
+        <input type="text" class="q-img" value="${q.image}">
+        <input type="text" class="opt1" value="${q.options[0]}">
+        <input type="text" class="opt2" value="${q.options[1]}">
+        <input type="text" class="opt3" value="${q.options[2]}">
+        <input type="text" class="opt4" value="${q.options[3]}">
         <select class="q-correct"></select>
       </div>
     `;
     container.insertAdjacentHTML("beforeend", html);
+
     const block = container.lastElementChild;
     updateCorrectDropdown(block);
+
     block.querySelector(`.q-correct option[value="${q.correct}"]`)?.setAttribute("selected", "selected");
 
     block.querySelectorAll(".opt1, .opt2, .opt3, .opt4").forEach(input => {
@@ -352,27 +365,29 @@ function editSet(id) {
 
   saveBtn.onclick = function() {
     const name = document.getElementById("setName").value.trim();
+    const privacy = document.getElementById("setPrivacy").value;
+
     if (!name) return alert("Enter a set name.");
 
     const blocks = [...document.querySelectorAll(".question-block")];
     if (blocks.length === 0) return alert("Add at least one question.");
 
-    const questionData = blocks.map(block => {
-      return {
-        question: block.querySelector(".q-text").value.trim(),
-        image: block.querySelector(".q-img").value.trim(),
-        options: [
-          block.querySelector(".opt1").value.trim(),
-          block.querySelector(".opt2").value.trim(),
-          block.querySelector(".opt3").value.trim(),
-          block.querySelector(".opt4").value.trim()
-        ],
-        correct: block.querySelector(".q-correct").value
-      };
-    });
+    const questionData = blocks.map(block => ({
+      question: block.querySelector(".q-text").value.trim(),
+      image: block.querySelector(".q-img").value.trim(),
+      options: [
+        block.querySelector(".opt1").value.trim(),
+        block.querySelector(".opt2").value.trim(),
+        block.querySelector(".opt3").value.trim(),
+        block.querySelector(".opt4").value.trim()
+      ],
+      correct: block.querySelector(".q-correct").value
+    }));
 
     set.name = name;
+    set.privacy = privacy;
     set.questions = questionData;
+
     localStorage.setItem("quizterraSets", JSON.stringify(sets));
 
     alert("Set Updated!");
@@ -382,6 +397,10 @@ function editSet(id) {
 
 function playSet(id) {
   window.location = `https://historypenguin.github.io/quizterra/play.html?setId=${id}`;
+}
+
+function viewSet(id) {
+  window.location = `https://historypenguin.github.io/quizterra/view.html?setId=${id}`;
 }
 
 function deleteSet(id) {
