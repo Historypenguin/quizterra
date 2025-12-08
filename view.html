@@ -83,10 +83,10 @@
 
   <div class="navbar">
     <h2>Quizterra</h2>
-    <a href="mysets.html" style="color:white; text-decoration:none; font-weight:600">My Sets</a>
+    <a id="shareBtn" style="margin-right:15px; cursor:pointer; color:white; font-weight:600;">Share<\/a><a href="mysets.html"" style="color:white; text-decoration:none; font-weight:600">My Sets</a>
   </div>
 
-  <div class="container">
+  <div class="container" style="overflow-y:auto; max-height:75vh;">
     <h1 id="setTitle">Set Title</h1>
     <p id="privacyStatus"></p>
     <button id="togglePrivacy">Toggle Privacy</button>
@@ -138,7 +138,45 @@
         container.appendChild(div);
       });
     }
-  </script>
+  // SHARE BUTTON + MODAL
+const modal = document.getElementById("shareModal");
+const shareInput = document.getElementById("shareInput");
+const copyBtn = document.getElementById("copyBtn");
+const closeModal = document.getElementById("closeModal");
 
+shareBtn.onclick = () => {
+  const link = window.location.href;
+  shareInput.value = link;
+  modal.style.display = "flex";
+};
+
+copyBtn.onclick = () => {
+  navigator.clipboard.writeText(shareInput.value);
+  copyBtn.innerText = "Copied!";
+  setTimeout(() => { copyBtn.innerText = "Copy"; }, 1200);
+};
+
+closeModal.onclick = () => {
+  modal.style.display = "none";
+};
+const shareBtn = document.getElementById("shareBtn");
+shareBtn.onclick = () => {
+  const link = window.location.href;
+  navigator.clipboard.writeText(link);
+  alert("Link copied to clipboard!
+" + link);
+};
+
+</script>
+
+<!-- SHARE MODAL -->
+<div id="shareModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div style="background:white; padding:20px; border-radius:10px; width:300px; text-align:center;">
+    <h3 style="margin-top:0;">Share Link</h3>
+    <input id="shareInput" type="text" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc;" readonly>
+    <button id="copyBtn" style="margin-top:10px; padding:10px 15px; background:#4a60ff; color:white; border:none; border-radius:5px; cursor:pointer;">Copy</button>
+    <button id="closeModal" style="margin-top:10px; padding:10px 15px; background:#ccc; color:black; border:none; border-radius:5px; cursor:pointer;">Close</button>
+  </div>
+</div>
 </body>
 </html>
