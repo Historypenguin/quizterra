@@ -6,116 +6,23 @@
 <title>Quizterra | Space Defense</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-body {
-  margin: 0;
-  font-family: Poppins, sans-serif;
-  background: black;
-  color: white;
-  overflow: hidden;
-}
-#gameContainer {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  background: url('https://i.postimg.cc/d3YYHWtS/in-space-national-space-day.gif') center/cover no-repeat;
-  background-size: cover;
-}
-#playerBlook {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 80px;
-  z-index: 3;
-}
-.enemy {
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  z-index: 2;
-}
-.enemy-bar {
-  position: absolute;
-  height: 6px;
-  background: #00ff95;
-  border-radius: 3px;
-  top: -10px;
-  left: 0;
-  width: 100%;
-  z-index: 3;
-}
-#questionOverlay {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.8);
-  padding: 20px;
-  border-radius: 14px;
-  display: none;
-  width: 400px;
-  text-align: center;
-  z-index: 5;
-}
-#questionOverlay h2 { font-size: 20px; margin-bottom: 15px; }
-#questionOverlay button {
-  margin: 5px;
-  padding: 10px 15px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
-  background: #00ff95;
-  color: black;
-}
-#questionOverlay img {
-  max-width: 100%;
-  max-height: 150px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-}
-#levelDisplay { position: absolute; top: 10px; left: 10px; font-size: 22px; z-index: 5; }
-#scoreDisplay { position: absolute; top: 10px; right: 10px; font-size: 22px; z-index: 5; }
-#waveBarContainer {
-  position: absolute;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 15px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 10px;
-  z-index: 5;
-}
-#waveBar {
-  height: 100%;
-  width: 0%;
-  background: #0fa6ff;
-  border-radius: 10px;
-  transition: width 0.3s linear;
-}
-#toggleBgm {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
-  background: #ffa500;
-  color: black;
-  z-index: 5;
-}
-.laser {
-  position: absolute;
-  width: 6px;
-  height: 20px;
-  background: #ff0000;
-  z-index: 4;
-  border-radius: 3px;
-}
+body { margin:0; font-family:Poppins,sans-serif; background:black; color:white; overflow:hidden; }
+#gameContainer { position:relative; width:100vw; height:100vh; background:url('https://i.postimg.cc/d3YYHWtS/in-space-national-space-day.gif') center/cover no-repeat; background-size:cover; }
+#playerBlook { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:80px; height:80px; z-index:3; }
+.enemy { position:absolute; width:60px; height:60px; z-index:2; }
+.enemy-bar { position:absolute; height:6px; background:#00ff95; border-radius:3px; top:-10px; left:0; width:100%; z-index:3; }
+#questionOverlay { position:absolute; top:20%; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); padding:20px; border-radius:14px; display:none; width:400px; text-align:center; z-index:5; }
+#questionOverlay h2 { font-size:20px; margin-bottom:15px; }
+#questionOverlay img { max-width:100%; max-height:150px; margin-bottom:10px; border-radius:10px; display:none; }
+#questionOverlay button { margin:5px; padding:10px 15px; border-radius:10px; border:none; font-weight:700; cursor:pointer; background:#00ff95; color:black; }
+#levelDisplay, #scoreDisplay { position:absolute; top:10px; font-size:22px; z-index:5; }
+#levelDisplay { left:10px; }
+#scoreDisplay { right:10px; }
+#waveBarContainer { position:absolute; top:50px; left:50%; transform:translateX(-50%); width:60%; height:15px; background:rgba(255,255,255,0.2); border-radius:10px; z-index:5; }
+#waveBar { height:100%; width:0%; background:#0fa6ff; border-radius:10px; transition:width 0.3s linear; }
+#toggleBgm { position:absolute; bottom:20px; right:20px; padding:10px 14px; border-radius:12px; font-weight:700; cursor:pointer; border:none; background:#ffa500; color:black; z-index:5; }
+.laser { position:absolute; width:6px; height:20px; background:#ff0000; z-index:4; border-radius:3px; }
+#waveText { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:40px; font-weight:900; color:#00ff95; display:none; z-index:6; text-shadow:0 0 10px #00ff95; }
 </style>
 </head>
 <body>
@@ -125,12 +32,11 @@ body {
 <div id="gameContainer">
   <div id="levelDisplay">Level: 1</div>
   <div id="scoreDisplay">Score: 0</div>
-  <div id="waveBarContainer">
-    <div id="waveBar"></div>
-  </div>
+  <div id="waveBarContainer"><div id="waveBar"></div></div>
+  <div id="waveText">Wave 1</div>
   <img id="playerBlook" src="https://i.postimg.cc/zymfxyR1/mystical.png">
   <div id="questionOverlay">
-    <img id="questionImage" src="" style="display:none;">
+    <img id="questionImage">
     <h2 id="questionText"></h2>
     <div id="optionsContainer"></div>
   </div>
@@ -138,193 +44,168 @@ body {
 </div>
 
 <script>
-// --- Music ---
-const bgm = document.getElementById("bg-music");
-bgm.volume = 0.5;
-function startMusic(){ bgm.play().catch(()=>{}); }
-function pauseMusic(){ bgm.pause(); }
-function resumeMusic(){ bgm.play().catch(()=>{}); }
-document.addEventListener("click", startMusic, {once:true});
-document.addEventListener("keydown", startMusic, {once:true});
-document.getElementById("toggleBgm").onclick = () => { if(bgm.paused) bgm.play(); else bgm.pause(); };
+const bgm=document.getElementById("bg-music"); bgm.volume=0.5;
+function startMusic(){bgm.play().catch(()=>{});}
+function pauseMusic(){bgm.pause();}
+function resumeMusic(){bgm.play().catch(()=>{});}
+document.addEventListener("click",startMusic,{once:true});
+document.addEventListener("keydown",startMusic,{once:true});
+document.getElementById("toggleBgm").onclick=()=>{if(bgm.paused) bgm.play(); else bgm.pause();};
 
-// --- Game Variables ---
-let level = 1;
-let score = 0;
-let enemies = [];
-let levelEnemies = 5;
-const gameContainer = document.getElementById("gameContainer");
-const questionOverlay = document.getElementById("questionOverlay");
-const questionText = document.getElementById("questionText");
-const optionsContainer = document.getElementById("optionsContainer");
-const questionImage = document.getElementById("questionImage");
-const waveBar = document.getElementById("waveBar");
-const playerBlook = document.getElementById("playerBlook");
+let level=1, score=0, enemies=[], levelEnemies=5, enemySpeed=1.5;
+const gameContainer=document.getElementById("gameContainer");
+const questionOverlay=document.getElementById("questionOverlay");
+const questionText=document.getElementById("questionText");
+const questionImage=document.getElementById("questionImage");
+const optionsContainer=document.getElementById("optionsContainer");
+const waveBar=document.getElementById("waveBar");
+const waveText=document.getElementById("waveText");
+const playerBlook=document.getElementById("playerBlook");
+let keys={};
 
-let keys = {};
-
-// Load user questions
-let user = JSON.parse(localStorage.getItem("quizterraUser"));
-let sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
-let allQuestions = [];
-if(user){
-  const mySets = sets.filter(s => s.owner === user.username);
-  mySets.forEach(s => allQuestions.push(...s.questions));
-}
-if(allQuestions.length===0){
-  allQuestions.push({question:"No questions found!", options:["Ok"], correct:"Ok"});
-}
-
-// Example Blook images
-const blookImages = [
-  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/asteroid.png",
-  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/blackHole.png",
-  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/moon.png",
+// Example Blooks
+const blookImages=[
+"https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/asteroid.png",
+"https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/blackHole.png",
+"https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/moon.png"
 ];
 
-// --- Functions ---
-function getCurrentBlookImage() {
-  const idx = Math.floor((level-1)/5);
-  return blookImages[Math.min(idx, blookImages.length-1)];
+// Load questions
+let user=JSON.parse(localStorage.getItem("quizterraUser"));
+let sets=JSON.parse(localStorage.getItem("quizterraSets"))||[];
+let allQuestions=[];
+if(user){
+  const mySets=sets.filter(s=>s.owner===user.username);
+  mySets.forEach(s=>allQuestions.push(...s.questions));
 }
+if(allQuestions.length===0) allQuestions.push({question:"No questions found!", options:["Ok"], correct:"Ok"});
 
-function spawnEnemy() {
-  const img = document.createElement("img");
-  img.src = getCurrentBlookImage();
-  img.className = "enemy";
-  img.style.top = "0px";
-  img.style.left = Math.random()*(window.innerWidth-60) + "px";
-  img.hp = 1;
-  const bar = document.createElement("div");
-  bar.className = "enemy-bar";
-  img.bar = bar;
+// --- Game Functions ---
+function getCurrentBlookImage(){const idx=Math.floor((level-1)/5); return blookImages[Math.min(idx,blookImages.length-1)];}
 
-  const wrapper = document.createElement("div");
-  wrapper.appendChild(img);
-  wrapper.appendChild(bar);
-  gameContainer.appendChild(wrapper);
-  enemies.push(img);
+function spawnEnemy(){
+  const img=document.createElement("img");
+  img.src=getCurrentBlookImage(); img.className="enemy"; img.style.top="0px"; img.style.left=Math.random()*(window.innerWidth-60)+"px";
+  img.hp=2; // multiple hits
+  const bar=document.createElement("div"); bar.className="enemy-bar"; img.bar=bar;
+  const wrapper=document.createElement("div"); wrapper.appendChild(img); wrapper.appendChild(bar);
+  gameContainer.appendChild(wrapper); enemies.push(img);
 }
 
 function spawnEnemies(count){
-  for(let i=0;i<count;i++){
-    setTimeout(spawnEnemy,i*400);
-  }
+  for(let i=0;i<count;i++) setTimeout(spawnEnemy,i*400);
 }
 
 function updateWaveBar(){
-  const total = levelEnemies;
-  const left = enemies.length;
-  const percent = ((total-left)/total)*100;
-  waveBar.style.width = percent+"%";
+  const total=levelEnemies;
+  const left=enemies.length;
+  const percent=((total-left)/total)*100;
+  waveBar.style.width=percent+"%";
 }
 
 function movePlayer(){
-  const speed = 6;
-  let rect = playerBlook.getBoundingClientRect();
-  if(keys["ArrowLeft"] || keys["a"]){ if(rect.left>0) playerBlook.style.left = rect.left - speed + "px"; }
-  if(keys["ArrowRight"] || keys["d"]){ if(rect.right<window.innerWidth) playerBlook.style.left = rect.left + speed + "px"; }
+  const speed=5;
+  let rect=playerBlook.getBoundingClientRect();
+  let containerRect=gameContainer.getBoundingClientRect();
+  let left=rect.left;
+  if(keys["ArrowLeft"]||keys["a"]){ left-=speed;}
+  if(keys["ArrowRight"]||keys["d"]){ left+=speed;}
+  left=Math.max(containerRect.left,Math.min(left,containerRect.right-rect.width));
+  playerBlook.style.left=left+"px";
 }
 
 function shootLaser(){
-  const laser = document.createElement("div");
-  laser.className = "laser";
-  const rect = playerBlook.getBoundingClientRect();
-  laser.style.left = (rect.left + rect.width/2 -3) + "px";
-  laser.style.top = (rect.top) + "px";
+  const laser=document.createElement("div");
+  laser.className="laser";
+  const rect=playerBlook.getBoundingClientRect();
+  laser.style.left=(rect.left+rect.width/2-3)+"px";
+  laser.style.top=rect.top+"px";
   gameContainer.appendChild(laser);
-
-  const anim = setInterval(()=>{
-    let top = parseInt(laser.style.top);
-    if(top<0){
-      laser.remove();
-      clearInterval(anim);
-    } else {
-      laser.style.top = top - 8 + "px";
-
+  const anim=setInterval(()=>{
+    let top=parseInt(laser.style.top);
+    if(top<0){ laser.remove(); clearInterval(anim); } 
+    else{
+      laser.style.top=top-8+"px";
       enemies.forEach(enemy=>{
-        const eRect = enemy.getBoundingClientRect();
-        if(rectOverlap(laser.getBoundingClientRect(), eRect)){
-          laser.remove();
-          clearInterval(anim);
-          enemy.parentElement.remove();
-          enemies = enemies.filter(e=>e!==enemy);
-          updateWaveBar();
-          checkLevelComplete();
+        const eRect=enemy.getBoundingClientRect();
+        if(rectOverlap(laser.getBoundingClientRect(),eRect)){
+          laser.remove(); clearInterval(anim);
+          enemy.hp--;
+          enemy.bar.style.width=((enemy.hp/2)*100)+"%";
+          if(enemy.hp<=0){
+            enemy.parentElement.remove();
+            enemies=enemies.filter(e=>e!==enemy);
+            score+=10;
+            document.getElementById("scoreDisplay").textContent="Score: "+score;
+            updateWaveBar();
+            checkLevelComplete();
+          }
         }
       });
     }
-  }, 15);
+  },15);
 }
 
-function rectOverlap(a,b){
-  return !(a.right<b.left || a.left>b.right || a.bottom<b.top || a.top>b.bottom);
+function rectOverlap(a,b){ return !(a.right<b.left || a.left>b.right || a.bottom<b.top || a.top>b.bottom); }
+
+function moveEnemies(){
+  enemies.forEach(enemy=>{
+    let top=parseInt(enemy.style.top);
+    top+=enemySpeed;
+    enemy.style.top=top+"px";
+    if(top+enemy.offsetHeight>=window.innerHeight){
+      enemy.parentElement.remove();
+      enemies=enemies.filter(e=>e!==enemy);
+      updateWaveBar();
+      checkLevelComplete();
+    }
+  });
 }
 
 function askQuestion(){
   pauseMusic();
-  let answersRequired = 3;
-  let correctCount = 0;
-
+  let answersRequired=3; let correctCount=0;
   function nextQuestion(){
-    if(correctCount>=answersRequired){
-      questionOverlay.style.display="none";
-      resumeMusic();
-      level++;
-      startLevel();
-      return;
-    }
-
-    const q = allQuestions[Math.floor(Math.random()*allQuestions.length)];
-    questionText.textContent = q.question;
-    if(q.image){ questionImage.src = q.image; questionImage.style.display="block"; }
-    else{ questionImage.style.display="none"; }
-
+    if(correctCount>=answersRequired){ questionOverlay.style.display="none"; resumeMusic(); level++; startLevel(); return;}
+    const q=allQuestions[Math.floor(Math.random()*allQuestions.length)];
+    questionText.textContent=q.question;
+    if(q.image){ questionImage.src=q.image; questionImage.style.display="block"; } else questionImage.style.display="none";
     optionsContainer.innerHTML="";
     q.options.forEach(opt=>{
-      const btn = document.createElement("button");
-      btn.textContent = opt;
-      btn.onclick = ()=>{
-        if(opt===q.correct) correctCount++;
-        else score-=5;
-        document.getElementById("scoreDisplay").textContent = "Score: "+score;
+      const btn=document.createElement("button"); btn.textContent=opt; btn.onclick=()=>{
+        if(opt===q.correct) correctCount++; else score-=5;
+        document.getElementById("scoreDisplay").textContent="Score: "+score;
         nextQuestion();
-      };
-      optionsContainer.appendChild(btn);
+      }; optionsContainer.appendChild(btn);
     });
     questionOverlay.style.display="block";
   }
-
   nextQuestion();
 }
 
 function startLevel(){
   document.getElementById("levelDisplay").textContent="Level: "+level;
-  levelEnemies = 5 + Math.floor(level/2);
+  levelEnemies=5+Math.floor(level/2);
   waveBar.style.width="0%";
+  showWaveText(level);
   spawnEnemies(levelEnemies);
-
-  // Wait a short time then ask questions if player wants to continue
-  setTimeout(()=>{ if(enemies.length>0) askQuestion(); }, 1000);
 }
 
-function checkLevelComplete(){
-  if(enemies.length===0) askQuestion();
+function showWaveText(num){
+  waveText.textContent="Wave "+num;
+  waveText.style.display="block";
+  setTimeout(()=>waveText.style.display="none",1500);
 }
 
-// --- Controls ---
-document.addEventListener("keydown", e=>keys[e.key]=true);
-document.addEventListener("keyup", e=>keys[e.key]=false);
-document.addEventListener("keydown", e=>{ if(e.key===" "){ shootLaser(); } });
+function checkLevelComplete(){ if(enemies.length===0) askQuestion(); }
 
-// --- Game Loop ---
-function gameLoop(){
-  movePlayer();
-  requestAnimationFrame(gameLoop);
-}
+document.addEventListener("keydown",e=>keys[e.key]=true);
+document.addEventListener("keyup",e=>keys[e.key]=false);
+document.addEventListener("keydown",e=>{ if(e.key===" "){ shootLaser(); } });
+
+function gameLoop(){ movePlayer(); moveEnemies(); requestAnimationFrame(gameLoop); }
 gameLoop();
 
-// --- Start Game ---
 startLevel();
 </script>
 </body>
