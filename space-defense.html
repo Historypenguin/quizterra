@@ -20,11 +20,20 @@ body {
   background: url('https://i.postimg.cc/d3YYHWtS/in-space-national-space-day.gif') center/cover no-repeat;
   background-size: cover;
 }
+#playerBlook {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  z-index: 3;
+}
 .enemy {
   position: absolute;
   width: 60px;
   height: 60px;
-  transition: top 1s linear, left 1s linear;
+  transition: top 0.2s linear;
   z-index: 2;
 }
 .enemy-bar {
@@ -34,6 +43,7 @@ body {
   border-radius: 3px;
   top: -10px;
   left: 0;
+  width: 100%;
   transition: width 0.2s linear;
   z-index: 3;
 }
@@ -60,6 +70,12 @@ body {
   cursor: pointer;
   background: #00ff95;
   color: black;
+}
+#questionOverlay img {
+  max-width: 100%;
+  max-height: 150px;
+  margin-bottom: 10px;
+  border-radius: 10px;
 }
 #levelDisplay { position: absolute; top: 10px; left: 10px; font-size: 22px; z-index: 5; }
 #scoreDisplay { position: absolute; top: 10px; right: 10px; font-size: 22px; z-index: 5; }
@@ -94,6 +110,33 @@ body {
   color: black;
   z-index: 5;
 }
+.laser {
+  position: absolute;
+  width: 6px;
+  height: 20px;
+  background: #ff0000;
+  z-index: 4;
+  border-radius: 3px;
+}
+.explosion {
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  background: rgba(255,200,0,0.8);
+  border-radius: 50%;
+  z-index: 4;
+  pointer-events: none;
+  animation: explode 300ms forwards;
+}
+@keyframes explode {
+  to {
+    width: 50px;
+    height: 50px;
+    margin-left: -25px;
+    margin-top: -25px;
+    opacity: 0;
+  }
+}
 </style>
 </head>
 <body>
@@ -106,7 +149,9 @@ body {
   <div id="waveBarContainer">
     <div id="waveBar"></div>
   </div>
+  <img id="playerBlook" src="https://i.postimg.cc/zymfxyR1/mystical.png">
   <div id="questionOverlay">
+    <img id="questionImage" src="" style="display:none;">
     <h2 id="questionText"></h2>
     <div id="optionsContainer"></div>
   </div>
@@ -117,54 +162,46 @@ body {
 // --- Music ---
 const bgm = document.getElementById("bg-music");
 bgm.volume = 0.5;
-
-function startMusic() { bgm.play().catch(()=>{}); }
-function pauseMusic() { bgm.pause(); }
-function resumeMusic() { bgm.play().catch(()=>{}); }
-
+function startMusic(){ bgm.play().catch(()=>{}); }
+function pauseMusic(){ bgm.pause(); }
+function resumeMusic(){ bgm.play().catch(()=>{}); }
 document.addEventListener("click", startMusic, {once:true});
 document.addEventListener("keydown", startMusic, {once:true});
-
-document.getElementById("toggleBgm").onclick = () => {
-  if(bgm.paused) bgm.play();
-  else bgm.pause();
-};
+document.getElementById("toggleBgm").onclick = () => { if(bgm.paused) bgm.play(); else bgm.pause(); };
 
 // --- Game Variables ---
 let level = 1;
 let score = 0;
 let enemies = [];
 let levelEnemies = 5;
+const correctAnswersNeeded = 3;
+
 const gameContainer = document.getElementById("gameContainer");
 const questionOverlay = document.getElementById("questionOverlay");
 const questionText = document.getElementById("questionText");
 const optionsContainer = document.getElementById("optionsContainer");
+const questionImage = document.getElementById("questionImage");
 const waveBar = document.getElementById("waveBar");
+const playerBlook = document.getElementById("playerBlook");
 
-// Blook images per level
-const blookImages = [
-  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/asteroid.png",
-  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/blackHole.png",
-  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/moon.png",
-  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/sun.png",
-  "https://i.postimg.cc/NGmtBqtG/space-Globe.png",
-  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/mars.png",
-  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/meteoroids.png",
-  "https://i.postimg.cc/dtCMLbX3/alienegg.png",
-  "https://i.postimg.cc/dt9ZKTVs/staryBot.png",
-  "https://i.postimg.cc/QM220nx8/Spaceship.gif",
-  "https://i.postimg.cc/Cxfdj2jB/constellation.gif",
-  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/astronaut.png"
-];
-
-// Load user questions
+// Load user questions from localStorage
 let user = JSON.parse(localStorage.getItem("quizterraUser"));
 let sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
 let allQuestions = [];
 if(user){
-  const mySets = sets.filter(s => s.owner===user.username);
+  const mySets = sets.filter(s => s.owner === user.username);
   mySets.forEach(s => allQuestions.push(...s.questions));
 }
+if(allQuestions.length===0){
+  allQuestions.push({question:"No questions found!", options:["Ok"], correct:"Ok"});
+}
+
+// Example Blook images
+const blookImages = [
+  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/asteroid.png",
+  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/blackHole.png",
+  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/moon.png",
+];
 
 // --- Functions ---
 function getCurrentBlookImage() {
@@ -182,8 +219,8 @@ function spawnEnemy() {
 
   const bar = document.createElement("div");
   bar.className = "enemy-bar";
-  img.hp = 1;
-  img.maxHp = 1;
+  img.hp = correctAnswersNeeded;
+  img.maxHp = correctAnswersNeeded;
   img.bar = bar;
 
   enemyWrapper.appendChild(img);
@@ -193,14 +230,11 @@ function spawnEnemy() {
 
   const interval = setInterval(() => {
     let top = parseInt(img.style.top);
-    if(top < window.innerHeight-100){
-      img.style.top = top + 2 + "px";
+    if(top < window.innerHeight-150){
+      img.style.top = top + 1.5 + "px";
     } else {
       clearInterval(interval);
-      gameContainer.removeChild(enemyWrapper);
-      enemies = enemies.filter(e=>e!==img);
-      askQuestion();
-      updateWaveBar();
+      askQuestion(img);
     }
   }, 20);
 }
@@ -218,34 +252,87 @@ function updateWaveBar(){
   waveBar.style.width = percent+"%";
 }
 
-function askQuestion(){
+function updateEnemyBar(enemy){
+  const percent = (enemy.hp/enemy.maxHp)*100;
+  enemy.bar.style.width = percent + "%";
+}
+
+function fireLaser(enemy, destroy=false){
+  const laser = document.createElement("div");
+  laser.className = "laser";
+  const playerRect = playerBlook.getBoundingClientRect();
+  const enemyRect = enemy.getBoundingClientRect();
+  laser.style.left = (playerRect.left + playerRect.width/2 - 3) + "px";
+  laser.style.top = (playerRect.top) + "px";
+  gameContainer.appendChild(laser);
+
+  const dx = (enemyRect.left + enemyRect.width/2) - (playerRect.left + playerRect.width/2);
+  const dy = (enemyRect.top + enemyRect.height/2) - (playerRect.top);
+  const steps = 30;
+  let step = 0;
+
+  const anim = setInterval(()=>{
+    if(step >= steps){
+      laser.remove();
+      clearInterval(anim);
+      if(destroy) createExplosion(enemy);
+    } else {
+      laser.style.left = (playerRect.left + playerRect.width/2 - 3 + dx*(step/steps)) + "px";
+      laser.style.top = (playerRect.top + dy*(step/steps)) + "px";
+      step++;
+    }
+  }, 15);
+}
+
+function createExplosion(enemy){
+  const enemyRect = enemy.getBoundingClientRect();
+  const explosion = document.createElement("div");
+  explosion.className = "explosion";
+  explosion.style.left = (enemyRect.left + enemyRect.width/2) + "px";
+  explosion.style.top = (enemyRect.top + enemyRect.height/2) + "px";
+  gameContainer.appendChild(explosion);
+
+  setTimeout(() => {
+    explosion.remove();
+    enemy.parentElement.remove();
+    enemies = enemies.filter(e=>e!==enemy);
+    updateWaveBar();
+    checkLevelComplete();
+  }, 300);
+}
+
+function askQuestion(enemy){
   pauseMusic();
-  if(allQuestions.length===0){
-    alert("No questions found. Create a set first!");
-    return;
-  }
   const q = allQuestions[Math.floor(Math.random()*allQuestions.length)];
+
+  if(q.image){ questionImage.src = q.image; questionImage.style.display="block"; }
+  else{ questionImage.style.display="none"; }
+
   questionText.textContent = q.question;
-  optionsContainer.innerHTML="";
+  optionsContainer.innerHTML = "";
+
   q.options.forEach(opt=>{
     const btn = document.createElement("button");
     btn.textContent = opt;
-    btn.onclick=()=>{
-      questionOverlay.style.display="none";
+    btn.onclick = () => {
+      if(opt === q.correct){
+        score += 10;
+        enemy.hp--;
+        updateEnemyBar(enemy);
+        fireLaser(enemy, enemy.hp<=0);
+      } else { score -= 5; fireLaser(enemy); }
+      document.getElementById("scoreDisplay").textContent = "Score: " + score;
+      questionOverlay.style.display = "none";
+
+      // Next question only if enemy still alive
+      if(enemy.hp > 0) askQuestion(enemy);
+      else if(enemies.length > 0) askQuestion(enemies[0]);
       resumeMusic();
-      if(opt===q.correct){ score+=10; }
-      else{ score-=5; }
-      document.getElementById("scoreDisplay").textContent="Score: "+score;
-      if(enemies.length>0){
-        const removed = enemies.pop();
-        removed.parentElement.remove();
-        updateWaveBar();
-      }
-      checkLevelComplete();
     };
     optionsContainer.appendChild(btn);
   });
-  questionOverlay.style.display="block";
+
+  questionOverlay.style.display = "block";
 }
 
 function startLevel(){
@@ -253,6 +340,7 @@ function startLevel(){
   levelEnemies = 5 + Math.floor(level/2);
   waveBar.style.width="0%";
   spawnEnemies(levelEnemies);
+  setTimeout(()=>{ if(enemies.length>0) askQuestion(enemies[0]); }, 1000);
 }
 
 function checkLevelComplete(){
