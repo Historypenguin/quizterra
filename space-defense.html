@@ -8,7 +8,7 @@
 <style>
 body { margin:0; font-family:Poppins,sans-serif; background:black; color:white; overflow:hidden; }
 #gameContainer { position:relative; width:100vw; height:100vh; background:url('https://i.postimg.cc/d3YYHWtS/in-space-national-space-day.gif') center/cover no-repeat; background-size:cover; }
-#playerBlook { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:80px; height:80px; z-index:3; }
+#playerBlook { position:absolute; width:80px; height:80px; z-index:3; }
 .enemy { position:absolute; width:60px; height:60px; z-index:2; }
 .enemy-bar { position:absolute; height:6px; background:#00ff95; border-radius:3px; top:-10px; left:0; width:100%; z-index:3; }
 #questionOverlay { position:absolute; top:20%; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); padding:20px; border-radius:14px; display:none; width:400px; text-align:center; z-index:5; }
@@ -62,6 +62,13 @@ const waveBar=document.getElementById("waveBar");
 const waveText=document.getElementById("waveText");
 const playerBlook=document.getElementById("playerBlook");
 let keys={};
+let playerX = window.innerWidth/2 - 40;
+let playerY = window.innerHeight - 100;
+const playerSpeed = 5;
+
+// Shooting cooldown
+let canShoot = true;
+const shootCooldown = 300;
 
 // Example Blooks
 const blookImages=[
@@ -74,19 +81,15 @@ const blookImages=[
 let user=JSON.parse(localStorage.getItem("quizterraUser"));
 let sets=JSON.parse(localStorage.getItem("quizterraSets"))||[];
 let allQuestions=[];
-if(user){
-  const mySets=sets.filter(s=>s.owner===user.username);
-  mySets.forEach(s=>allQuestions.push(...s.questions));
-}
+if(user){ const mySets=sets.filter(s=>s.owner===user.username); mySets.forEach(s=>allQuestions.push(...s.questions)); }
 if(allQuestions.length===0) allQuestions.push({question:"No questions found!", options:["Ok"], correct:"Ok"});
 
-// --- Game Functions ---
 function getCurrentBlookImage(){const idx=Math.floor((level-1)/5); return blookImages[Math.min(idx,blookImages.length-1)];}
 
 function spawnEnemy(){
   const img=document.createElement("img");
   img.src=getCurrentBlookImage(); img.className="enemy"; img.style.top="0px"; img.style.left=Math.random()*(window.innerWidth-60)+"px";
-  img.hp=2; // multiple hits
+  img.hp=2;
   const bar=document.createElement("div"); bar.className="enemy-bar"; img.bar=bar;
   const wrapper=document.createElement("div"); wrapper.appendChild(img); wrapper.appendChild(bar);
   gameContainer.appendChild(wrapper); enemies.push(img);
@@ -97,38 +100,43 @@ function spawnEnemies(count){
 }
 
 function updateWaveBar(){
-  const total=levelEnemies;
-  const left=enemies.length;
-  const percent=((total-left)/total)*100;
-  waveBar.style.width=percent+"%";
+  const total=levelEnemies; const left=enemies.length;
+  const percent=((total-left)/total)*100; waveBar.style.width=percent+"%";
 }
 
 function movePlayer(){
-  const speed=5;
-  let rect=playerBlook.getBoundingClientRect();
-  let containerRect=gameContainer.getBoundingClientRect();
-  let left=rect.left;
-  if(keys["ArrowLeft"]||keys["a"]){ left-=speed;}
-  if(keys["ArrowRight"]||keys["d"]){ left+=speed;}
-  left=Math.max(containerRect.left,Math.min(left,containerRect.right-rect.width));
-  playerBlook.style.left=left+"px";
+  if(keys["ArrowLeft"] || keys["a"]){ playerX -= playerSpeed; }
+  if(keys["ArrowRight"] || keys["d"]){ playerX += playerSpeed; }
+  if(keys["ArrowUp"] || keys["w"]){ playerY -= playerSpeed; }
+  if(keys["ArrowDown"] || keys["s"]){ playerY += playerSpeed; }
+
+  playerX = Math.max(0, Math.min(playerX, window.innerWidth - playerBlook.offsetWidth));
+  playerY = Math.max(0, Math.min(playerY, window.innerHeight - playerBlook.offsetHeight));
+
+  playerBlook.style.left = playerX + "px";
+  playerBlook.style.top = playerY + "px";
 }
 
 function shootLaser(){
+  if(!canShoot) return;
+  canShoot=false;
+  setTimeout(()=>canShoot=true, shootCooldown);
+
   const laser=document.createElement("div");
   laser.className="laser";
-  const rect=playerBlook.getBoundingClientRect();
-  laser.style.left=(rect.left+rect.width/2-3)+"px";
-  laser.style.top=rect.top+"px";
+  laser.style.left=(playerX+playerBlook.offsetWidth/2-3)+"px";
+  laser.style.top=playerY+"px";
   gameContainer.appendChild(laser);
+
   const anim=setInterval(()=>{
     let top=parseInt(laser.style.top);
-    if(top<0){ laser.remove(); clearInterval(anim); } 
+    if(top<0){ laser.remove(); clearInterval(anim); }
     else{
       laser.style.top=top-8+"px";
       enemies.forEach(enemy=>{
         const eRect=enemy.getBoundingClientRect();
-        if(rectOverlap(laser.getBoundingClientRect(),eRect)){
+        const lRect=laser.getBoundingClientRect();
+        if(!(lRect.right<eRect.left || lRect.left>eRect.right || lRect.bottom<eRect.top || lRect.top>eRect.bottom)){
           laser.remove(); clearInterval(anim);
           enemy.hp--;
           enemy.bar.style.width=((enemy.hp/2)*100)+"%";
@@ -146,11 +154,9 @@ function shootLaser(){
   },15);
 }
 
-function rectOverlap(a,b){ return !(a.right<b.left || a.left>b.right || a.bottom<b.top || a.top>b.bottom); }
-
 function moveEnemies(){
   enemies.forEach(enemy=>{
-    let top=parseInt(enemy.style.top);
+    let top=parseFloat(enemy.style.top);
     top+=enemySpeed;
     enemy.style.top=top+"px";
     if(top+enemy.offsetHeight>=window.innerHeight){
@@ -201,11 +207,10 @@ function checkLevelComplete(){ if(enemies.length===0) askQuestion(); }
 
 document.addEventListener("keydown",e=>keys[e.key]=true);
 document.addEventListener("keyup",e=>keys[e.key]=false);
-document.addEventListener("keydown",e=>{ if(e.key===" "){ shootLaser(); } });
+document.addEventListener("keydown",e=>{ if(e.key===" ") shootLaser(); });
 
 function gameLoop(){ movePlayer(); moveEnemies(); requestAnimationFrame(gameLoop); }
 gameLoop();
-
 startLevel();
 </script>
 </body>
