@@ -26,6 +26,7 @@ body {margin:0; font-family:Poppins,sans-serif; display:flex; height:100vh; back
 .play-btn{background:#00ff95;color:black;}.play-btn:hover{background:#33ffaa;transform:scale(1.05);}
 .view-btn{background:#4ecbff;color:black;}.view-btn:hover{background:#7edaff;transform:scale(1.05);}
 .question-block{background:rgba(0,0,0,0.2);padding:12px;border-radius:12px;margin-bottom:15px;}
+.question-block img{max-width:80%;height:auto;margin:4px 0;border-radius:6px;}
 .answers div{margin:4px 0;padding:8px;background:rgba(255,255,255,0.1);border-radius:6px;color:white;font-size:13px;}
 .correct{background:#00ff95;color:black;}
 </style>
@@ -75,7 +76,7 @@ const container=document.getElementById('questionsContainer');
 setData.questions.forEach((q,i)=>{
 const div=document.createElement('div');
 div.className='question-block';
-div.innerHTML=`<h3>Q${i+1}: ${q.question}</h3>${q.image?`<img src='${q.image}' style='width:100%;margin:4px 0;border-radius:6px;'>`:''}<div class='answers'>${q.options.map(opt=>`<div class='${q.correct===opt?'correct':''}'>${opt}</div>`).join('')}</div>`;
+div.innerHTML=`<h3>Q${i+1}: ${q.question}</h3>${q.image?`<img src='${q.image}' style='max-width:50%;'>`:''}<div class='answers'>${q.options.map(opt=>`<div class='${q.correct===opt?'correct':''}'>${opt}</div>`).join('')}</div>`;
 container.appendChild(div);
 });
 }
