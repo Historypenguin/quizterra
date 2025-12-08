@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quizterra | Space Defense</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  font-family: Poppins, sans-serif;
+  background: black;
+  color: white;
+  overflow: hidden;
+}
+#gameContainer {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: url('https://i.postimg.cc/d3YYHWtS/in-space-national-space-day.gif') center/cover no-repeat;
+  background-size: cover;
+}
+.enemy {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  transition: top 1s linear, left 1s linear;
+  z-index: 2;
+}
+.enemy-bar {
+  position: absolute;
+  height: 6px;
+  background: #00ff95;
+  border-radius: 3px;
+  top: -10px;
+  left: 0;
+  transition: width 0.2s linear;
+  z-index: 3;
+}
+#questionOverlay {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  padding: 20px;
+  border-radius: 14px;
+  display: none;
+  width: 400px;
+  text-align: center;
+  z-index: 5;
+}
+#questionOverlay h2 { font-size: 20px; margin-bottom: 15px; }
+#questionOverlay button {
+  margin: 5px;
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  background: #00ff95;
+  color: black;
+}
+#levelDisplay { position: absolute; top: 10px; left: 10px; font-size: 22px; z-index: 5; }
+#scoreDisplay { position: absolute; top: 10px; right: 10px; font-size: 22px; z-index: 5; }
+#waveBarContainer {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 15px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  z-index: 5;
+}
+#waveBar {
+  height: 100%;
+  width: 0%;
+  background: #0fa6ff;
+  border-radius: 10px;
+  transition: width 0.3s linear;
+}
+#toggleBgm {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  background: #ffa500;
+  color: black;
+  z-index: 5;
+}
+</style>
+</head>
+<body>
+
+<audio id="bg-music" src="sci-fi-ambient-349387.mp3" loop></audio>
+
+<div id="gameContainer">
+  <div id="levelDisplay">Level: 1</div>
+  <div id="scoreDisplay">Score: 0</div>
+  <div id="waveBarContainer">
+    <div id="waveBar"></div>
+  </div>
+  <div id="questionOverlay">
+    <h2 id="questionText"></h2>
+    <div id="optionsContainer"></div>
+  </div>
+  <button id="toggleBgm">Mute Music</button>
+</div>
+
+<script>
+// --- Music ---
+const bgm = document.getElementById("bg-music");
+bgm.volume = 0.5;
+
+function startMusic() { bgm.play().catch(()=>{}); }
+function pauseMusic() { bgm.pause(); }
+function resumeMusic() { bgm.play().catch(()=>{}); }
+
+document.addEventListener("click", startMusic, {once:true});
+document.addEventListener("keydown", startMusic, {once:true});
+
+document.getElementById("toggleBgm").onclick = () => {
+  if(bgm.paused) bgm.play();
+  else bgm.pause();
+};
+
+// --- Game Variables ---
+let level = 1;
+let score = 0;
+let enemies = [];
+let levelEnemies = 5;
+const gameContainer = document.getElementById("gameContainer");
+const questionOverlay = document.getElementById("questionOverlay");
+const questionText = document.getElementById("questionText");
+const optionsContainer = document.getElementById("optionsContainer");
+const waveBar = document.getElementById("waveBar");
+
+// Blook images per level
+const blookImages = [
+  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/asteroid.png",
+  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/blackHole.png",
+  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/moon.png",
+  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/sun.png",
+  "https://i.postimg.cc/NGmtBqtG/space-Globe.png",
+  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/mars.png",
+  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/meteoroids.png",
+  "https://i.postimg.cc/dtCMLbX3/alienegg.png",
+  "https://i.postimg.cc/dt9ZKTVs/staryBot.png",
+  "https://i.postimg.cc/QM220nx8/Spaceship.gif",
+  "https://i.postimg.cc/Cxfdj2jB/constellation.gif",
+  "https://cdn.glitch.global/36ec2602-304b-444b-8f2f-08c65c92bbc0/thumbnails/astronaut.png"
+];
+
+// Load user questions
+let user = JSON.parse(localStorage.getItem("quizterraUser"));
+let sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
+let allQuestions = [];
+if(user){
+  const mySets = sets.filter(s => s.owner===user.username);
+  mySets.forEach(s => allQuestions.push(...s.questions));
+}
+
+// --- Functions ---
+function getCurrentBlookImage() {
+  const idx = Math.floor((level-1)/5);
+  return blookImages[Math.min(idx, blookImages.length-1)];
+}
+
+function spawnEnemy() {
+  const enemyWrapper = document.createElement("div");
+  const img = document.createElement("img");
+  img.src = getCurrentBlookImage();
+  img.className = "enemy";
+  img.style.top = "0px";
+  img.style.left = Math.random()*(window.innerWidth-60) + "px";
+
+  const bar = document.createElement("div");
+  bar.className = "enemy-bar";
+  img.hp = 1;
+  img.maxHp = 1;
+  img.bar = bar;
+
+  enemyWrapper.appendChild(img);
+  enemyWrapper.appendChild(bar);
+  gameContainer.appendChild(enemyWrapper);
+  enemies.push(img);
+
+  const interval = setInterval(() => {
+    let top = parseInt(img.style.top);
+    if(top < window.innerHeight-100){
+      img.style.top = top + 2 + "px";
+    } else {
+      clearInterval(interval);
+      gameContainer.removeChild(enemyWrapper);
+      enemies = enemies.filter(e=>e!==img);
+      askQuestion();
+      updateWaveBar();
+    }
+  }, 20);
+}
+
+function spawnEnemies(count){
+  for(let i=0;i<count;i++){
+    setTimeout(spawnEnemy,i*800);
+  }
+}
+
+function updateWaveBar(){
+  const total = levelEnemies;
+  const left = enemies.length;
+  const percent = ((total-left)/total)*100;
+  waveBar.style.width = percent+"%";
+}
+
+function askQuestion(){
+  pauseMusic();
+  if(allQuestions.length===0){
+    alert("No questions found. Create a set first!");
+    return;
+  }
+  const q = allQuestions[Math.floor(Math.random()*allQuestions.length)];
+  questionText.textContent = q.question;
+  optionsContainer.innerHTML="";
+  q.options.forEach(opt=>{
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.onclick=()=>{
+      questionOverlay.style.display="none";
+      resumeMusic();
+      if(opt===q.correct){ score+=10; }
+      else{ score-=5; }
+      document.getElementById("scoreDisplay").textContent="Score: "+score;
+      if(enemies.length>0){
+        const removed = enemies.pop();
+        removed.parentElement.remove();
+        updateWaveBar();
+      }
+      checkLevelComplete();
+    };
+    optionsContainer.appendChild(btn);
+  });
+  questionOverlay.style.display="block";
+}
+
+function startLevel(){
+  document.getElementById("levelDisplay").textContent="Level: "+level;
+  levelEnemies = 5 + Math.floor(level/2);
+  waveBar.style.width="0%";
+  spawnEnemies(levelEnemies);
+}
+
+function checkLevelComplete(){
+  if(enemies.length===0){
+    level++;
+    startLevel();
+  }
+}
+
+// --- Start Game ---
+startLevel();
+</script>
+</body>
+</html>
