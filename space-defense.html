@@ -33,7 +33,6 @@ body {
   position: absolute;
   width: 60px;
   height: 60px;
-  transition: top 0.2s linear;
   z-index: 2;
 }
 .enemy-bar {
@@ -44,7 +43,6 @@ body {
   top: -10px;
   left: 0;
   width: 100%;
-  transition: width 0.2s linear;
   z-index: 3;
 }
 #questionOverlay {
@@ -118,30 +116,11 @@ body {
   z-index: 4;
   border-radius: 3px;
 }
-.explosion {
-  position: absolute;
-  width: 0px;
-  height: 0px;
-  background: rgba(255,200,0,0.8);
-  border-radius: 50%;
-  z-index: 4;
-  pointer-events: none;
-  animation: explode 300ms forwards;
-}
-@keyframes explode {
-  to {
-    width: 50px;
-    height: 50px;
-    margin-left: -25px;
-    margin-top: -25px;
-    opacity: 0;
-  }
-}
 </style>
 </head>
 <body>
 
-<audio id="bg-music" src="sci-fi-ambient-349387.mp3" loop></audio>
+<audio id="bg-music" src="https://cdn.pixabay.com/download/audio/2022/02/23/audio_2a1f3b3f13.mp3?filename=low-drones-sci-fi-ambient-349387.mp3" loop></audio>
 
 <div id="gameContainer">
   <div id="levelDisplay">Level: 1</div>
@@ -174,8 +153,6 @@ let level = 1;
 let score = 0;
 let enemies = [];
 let levelEnemies = 5;
-const correctAnswersNeeded = 3;
-
 const gameContainer = document.getElementById("gameContainer");
 const questionOverlay = document.getElementById("questionOverlay");
 const questionText = document.getElementById("questionText");
@@ -184,7 +161,9 @@ const questionImage = document.getElementById("questionImage");
 const waveBar = document.getElementById("waveBar");
 const playerBlook = document.getElementById("playerBlook");
 
-// Load user questions from localStorage
+let keys = {};
+
+// Load user questions
 let user = JSON.parse(localStorage.getItem("quizterraUser"));
 let sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
 let allQuestions = [];
@@ -210,38 +189,26 @@ function getCurrentBlookImage() {
 }
 
 function spawnEnemy() {
-  const enemyWrapper = document.createElement("div");
   const img = document.createElement("img");
   img.src = getCurrentBlookImage();
   img.className = "enemy";
   img.style.top = "0px";
   img.style.left = Math.random()*(window.innerWidth-60) + "px";
-
+  img.hp = 1;
   const bar = document.createElement("div");
   bar.className = "enemy-bar";
-  img.hp = correctAnswersNeeded;
-  img.maxHp = correctAnswersNeeded;
   img.bar = bar;
 
-  enemyWrapper.appendChild(img);
-  enemyWrapper.appendChild(bar);
-  gameContainer.appendChild(enemyWrapper);
+  const wrapper = document.createElement("div");
+  wrapper.appendChild(img);
+  wrapper.appendChild(bar);
+  gameContainer.appendChild(wrapper);
   enemies.push(img);
-
-  const interval = setInterval(() => {
-    let top = parseInt(img.style.top);
-    if(top < window.innerHeight-150){
-      img.style.top = top + 1.5 + "px";
-    } else {
-      clearInterval(interval);
-      askQuestion(img);
-    }
-  }, 20);
 }
 
 function spawnEnemies(count){
   for(let i=0;i<count;i++){
-    setTimeout(spawnEnemy,i*800);
+    setTimeout(spawnEnemy,i*400);
   }
 }
 
@@ -252,87 +219,83 @@ function updateWaveBar(){
   waveBar.style.width = percent+"%";
 }
 
-function updateEnemyBar(enemy){
-  const percent = (enemy.hp/enemy.maxHp)*100;
-  enemy.bar.style.width = percent + "%";
+function movePlayer(){
+  const speed = 6;
+  let rect = playerBlook.getBoundingClientRect();
+  if(keys["ArrowLeft"] || keys["a"]){ if(rect.left>0) playerBlook.style.left = rect.left - speed + "px"; }
+  if(keys["ArrowRight"] || keys["d"]){ if(rect.right<window.innerWidth) playerBlook.style.left = rect.left + speed + "px"; }
 }
 
-function fireLaser(enemy, destroy=false){
+function shootLaser(){
   const laser = document.createElement("div");
   laser.className = "laser";
-  const playerRect = playerBlook.getBoundingClientRect();
-  const enemyRect = enemy.getBoundingClientRect();
-  laser.style.left = (playerRect.left + playerRect.width/2 - 3) + "px";
-  laser.style.top = (playerRect.top) + "px";
+  const rect = playerBlook.getBoundingClientRect();
+  laser.style.left = (rect.left + rect.width/2 -3) + "px";
+  laser.style.top = (rect.top) + "px";
   gameContainer.appendChild(laser);
 
-  const dx = (enemyRect.left + enemyRect.width/2) - (playerRect.left + playerRect.width/2);
-  const dy = (enemyRect.top + enemyRect.height/2) - (playerRect.top);
-  const steps = 30;
-  let step = 0;
-
   const anim = setInterval(()=>{
-    if(step >= steps){
+    let top = parseInt(laser.style.top);
+    if(top<0){
       laser.remove();
       clearInterval(anim);
-      if(destroy) createExplosion(enemy);
     } else {
-      laser.style.left = (playerRect.left + playerRect.width/2 - 3 + dx*(step/steps)) + "px";
-      laser.style.top = (playerRect.top + dy*(step/steps)) + "px";
-      step++;
+      laser.style.top = top - 8 + "px";
+
+      enemies.forEach(enemy=>{
+        const eRect = enemy.getBoundingClientRect();
+        if(rectOverlap(laser.getBoundingClientRect(), eRect)){
+          laser.remove();
+          clearInterval(anim);
+          enemy.parentElement.remove();
+          enemies = enemies.filter(e=>e!==enemy);
+          updateWaveBar();
+          checkLevelComplete();
+        }
+      });
     }
   }, 15);
 }
 
-function createExplosion(enemy){
-  const enemyRect = enemy.getBoundingClientRect();
-  const explosion = document.createElement("div");
-  explosion.className = "explosion";
-  explosion.style.left = (enemyRect.left + enemyRect.width/2) + "px";
-  explosion.style.top = (enemyRect.top + enemyRect.height/2) + "px";
-  gameContainer.appendChild(explosion);
-
-  setTimeout(() => {
-    explosion.remove();
-    enemy.parentElement.remove();
-    enemies = enemies.filter(e=>e!==enemy);
-    updateWaveBar();
-    checkLevelComplete();
-  }, 300);
+function rectOverlap(a,b){
+  return !(a.right<b.left || a.left>b.right || a.bottom<b.top || a.top>b.bottom);
 }
 
-function askQuestion(enemy){
+function askQuestion(){
   pauseMusic();
-  const q = allQuestions[Math.floor(Math.random()*allQuestions.length)];
+  let answersRequired = 3;
+  let correctCount = 0;
 
-  if(q.image){ questionImage.src = q.image; questionImage.style.display="block"; }
-  else{ questionImage.style.display="none"; }
-
-  questionText.textContent = q.question;
-  optionsContainer.innerHTML = "";
-
-  q.options.forEach(opt=>{
-    const btn = document.createElement("button");
-    btn.textContent = opt;
-    btn.onclick = () => {
-      if(opt === q.correct){
-        score += 10;
-        enemy.hp--;
-        updateEnemyBar(enemy);
-        fireLaser(enemy, enemy.hp<=0);
-      } else { score -= 5; fireLaser(enemy); }
-      document.getElementById("scoreDisplay").textContent = "Score: " + score;
-      questionOverlay.style.display = "none";
-
-      // Next question only if enemy still alive
-      if(enemy.hp > 0) askQuestion(enemy);
-      else if(enemies.length > 0) askQuestion(enemies[0]);
+  function nextQuestion(){
+    if(correctCount>=answersRequired){
+      questionOverlay.style.display="none";
       resumeMusic();
-    };
-    optionsContainer.appendChild(btn);
-  });
+      level++;
+      startLevel();
+      return;
+    }
 
-  questionOverlay.style.display = "block";
+    const q = allQuestions[Math.floor(Math.random()*allQuestions.length)];
+    questionText.textContent = q.question;
+    if(q.image){ questionImage.src = q.image; questionImage.style.display="block"; }
+    else{ questionImage.style.display="none"; }
+
+    optionsContainer.innerHTML="";
+    q.options.forEach(opt=>{
+      const btn = document.createElement("button");
+      btn.textContent = opt;
+      btn.onclick = ()=>{
+        if(opt===q.correct) correctCount++;
+        else score-=5;
+        document.getElementById("scoreDisplay").textContent = "Score: "+score;
+        nextQuestion();
+      };
+      optionsContainer.appendChild(btn);
+    });
+    questionOverlay.style.display="block";
+  }
+
+  nextQuestion();
 }
 
 function startLevel(){
@@ -340,15 +303,26 @@ function startLevel(){
   levelEnemies = 5 + Math.floor(level/2);
   waveBar.style.width="0%";
   spawnEnemies(levelEnemies);
-  setTimeout(()=>{ if(enemies.length>0) askQuestion(enemies[0]); }, 1000);
+
+  // Wait a short time then ask questions if player wants to continue
+  setTimeout(()=>{ if(enemies.length>0) askQuestion(); }, 1000);
 }
 
 function checkLevelComplete(){
-  if(enemies.length===0){
-    level++;
-    startLevel();
-  }
+  if(enemies.length===0) askQuestion();
 }
+
+// --- Controls ---
+document.addEventListener("keydown", e=>keys[e.key]=true);
+document.addEventListener("keyup", e=>keys[e.key]=false);
+document.addEventListener("keydown", e=>{ if(e.key===" "){ shootLaser(); } });
+
+// --- Game Loop ---
+function gameLoop(){
+  movePlayer();
+  requestAnimationFrame(gameLoop);
+}
+gameLoop();
 
 // --- Start Game ---
 startLevel();
