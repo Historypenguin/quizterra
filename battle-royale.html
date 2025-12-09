@@ -149,45 +149,78 @@ body {
   border-radius: 12px;
   border: 2px solid white;
 }
+
+#typingBox {
+  display: none;
+  margin-top: 15px;
+}
+
+#typingInput {
+  padding: 12px;
+  width: 100%;
+  border-radius: 12px;
+  border: none;
+  font-size: 18px;
+}
+
+#typingSubmit {
+  margin-top: 10px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 15px;
+  background: #0fa6ff;
+  color: white;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+#typingSubmit:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
 
 <div class="quiz-container">
-  <!-- Flag button -->
+
   <div class="top-icons">
     <button class="icon-btn" id="endBtn" title="End Battle">🚩</button>
   </div>
 
-  <!-- Left panel: Player & Enemy -->
+  <!-- PANELS -->
   <div class="left-panel">
     <div class="player-box">
-      <img id="player-img" src="https://i.postimg.cc/2yWnW6sY/wizard.png" alt="Player">
+      <img id="player-img" src="https://i.postimg.cc/2yWnW6sY/wizard.png">
       <div id="player-name">You</div>
       <div class="hp-bar-bg"><div class="hp-bar-fill" id="player-hp">100</div></div>
     </div>
 
     <div class="enemy-box">
-      <img id="enemy-img" src="" alt="Enemy">
+      <img id="enemy-img">
       <div id="enemy-name"></div>
       <div class="hp-bar-bg"><div class="hp-bar-fill" id="enemy-hp">0</div></div>
     </div>
   </div>
 
-  <!-- Right panel: Question & Options -->
   <div class="right-panel">
     <h2 id="setTitle">Loading Battle...</h2>
+
     <div class="question-box" id="questionBox"></div>
 
-    <div class="options-grid">
+    <!-- Multiple choice grid -->
+    <div class="options-grid" id="mcGrid">
       <button class="option-btn red" id="btnRed"></button>
       <button class="option-btn orange" id="btnOrange"></button>
       <button class="option-btn green" id="btnGreen"></button>
       <button class="option-btn blue" id="btnBlue"></button>
     </div>
+
+    <!-- Typing answer UI -->
+    <div id="typingBox">
+      <input id="typingInput" placeholder="Type your answer...">
+      <button id="typingSubmit">Submit</button>
+    </div>
   </div>
 
-  <!-- Battle log -->
   <div style="width:100%;">
     <div id="battle-log"></div>
   </div>
@@ -195,16 +228,15 @@ body {
 
 <script>
 let user = JSON.parse(localStorage.getItem("quizterraUser"));
-if(!user) window.location="login.html";
+if(!user) location.href="login.html";
 
-if(!user.stats) {
-  user.stats = { correct:0, wrong:0 };
-  localStorage.setItem("quizterraUser", JSON.stringify(user));
-}
+// Load selected set from Game Modes page
+const set = JSON.parse(localStorage.getItem("currentSet"));
+if(!set) { alert("No set loaded!"); location.href="select.html"; }
 
-const sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
-const playerSet = sets.find(s=>s.owner===user.username);
-if(!playerSet) { alert("You need at least one set!"); throw "No set"; }
+document.getElementById("setTitle").textContent = set.name;
+
+const playerQuestions = set.questions;
 
 const enemyRounds = [
   {name:"Iced Blue Donut", hp:50, attack:8, image:"https://i.postimg.cc/GpCtt1Yq/Iced-Blue-Donut.webp"},
@@ -218,128 +250,164 @@ const enemyRounds = [
 let currentRound = 0;
 let enemy = {...enemyRounds[currentRound]};
 let playerHp = 100;
-let questionTimer;
+let questionData = null;
 
-const enemyImg = document.getElementById("enemy-img");
-const enemyName = document.getElementById("enemy-name");
-const enemyHpBar = document.getElementById("enemy-hp");
-const playerHpBar = document.getElementById("player-hp");
+const mcGrid = document.getElementById("mcGrid");
+const typingBox = document.getElementById("typingBox");
+const typingInput = document.getElementById("typingInput");
+const typingSubmit = document.getElementById("typingSubmit");
 const questionBox = document.getElementById("questionBox");
-const battleLog = document.getElementById("battle-log");
-const btns = {
-  Red: document.getElementById("btnRed"),
-  Orange: document.getElementById("btnOrange"),
-  Green: document.getElementById("btnGreen"),
-  Blue: document.getElementById("btnBlue")
-};
+
+function log(msg){
+  battleLog.innerHTML += msg + "<br>";
+  battleLog.scrollTop = battleLog.scrollHeight;
+}
 
 document.getElementById("endBtn").onclick = () => {
   if(confirm("End battle?")) location.href="stats.html";
 };
 
-function log(msg){ battleLog.innerHTML += msg+"<br>"; battleLog.scrollTop=battleLog.scrollHeight; }
-
 function loadEnemy(){
   enemy = {...enemyRounds[currentRound]};
-  enemyImg.src = enemy.image;
-  enemyName.textContent = enemy.name;
-  enemyHpBar.style.width = enemy.hp+"px";
-  enemyHpBar.textContent = enemy.hp;
+  document.getElementById("enemy-img").src = enemy.image;
+  document.getElementById("enemy-name").innerText = enemy.name;
+
+  document.getElementById("enemy-hp").style.width = enemy.hp + "px";
+  document.getElementById("enemy-hp").innerText = enemy.hp;
+
   log(`⚔️ ${enemy.name} appears!`);
   showQuestion();
 }
 
-function showQuestion(){
-  const q = playerSet.questions[Math.floor(Math.random()*playerSet.questions.length)];
-  questionBox.innerHTML = q.question;
-  if(q.image){
+function showQuestion() {
+  questionData = playerQuestions[Math.floor(Math.random() * playerQuestions.length)];
+
+  questionBox.innerHTML = questionData.question;
+  if(questionData.image){
     const img = document.createElement("img");
-    img.src = q.image;
+    img.src = questionData.image;
     questionBox.appendChild(img);
   }
 
-  const colors = ["Red","Orange","Green","Blue"];
-  colors.forEach((color,i)=>{
-    const btn = btns[color];
-    btn.textContent = q.options[i]||"";
-    btn.disabled=false;
-    btn.classList.remove("option-correct","option-wrong");
-    btn.onclick = ()=>selectAnswer(btn.textContent,q.correct);
-  });
+  // Typing Question
+  if(questionData.type === "typing"){
+    mcGrid.style.display = "none";
+    typingBox.style.display = "block";
 
-  clearTimeout(questionTimer);
-  questionTimer = setTimeout(()=>nextQuestion(q.correct,null),15000);
+    typingInput.value = "";
+    typingSubmit.onclick = () => checkAnswer(typingInput.value.trim(), questionData.correct);
+  }
+  else {
+    mcGrid.style.display = "grid";
+    typingBox.style.display = "none";
+
+    const colors = ["Red","Orange","Green","Blue"];
+    const btns = {
+      Red: btnRed,
+      Orange: btnOrange,
+      Green: btnGreen,
+      Blue: btnBlue
+    };
+
+    colors.forEach((c,i)=>{
+      const btn = btns[c];
+      btn.textContent = questionData.options[i] || "";
+      btn.classList.remove("option-correct","option-wrong");
+      btn.onclick = () => checkAnswer(btn.textContent, questionData.correct);
+    });
+  }
 }
 
-function selectAnswer(selected, correct){
-  nextQuestion(correct, selected);
+function checkAnswer(selected, correct){
+  let isCorrect = false;
+
+  if(questionData.type === "typing"){
+    isCorrect = selected.toLowerCase() === correct.toLowerCase();
+  } else {
+    isCorrect = selected === correct;
+  }
+
+  handleDamage(isCorrect);
 }
 
-function nextQuestion(correct, selected){
-  const colors = ["Red","Orange","Green","Blue"];
-  colors.forEach(color=>{
-    const btn = btns[color];
-    btn.disabled=true;
-    if(selected){
-      if(btn.textContent===correct) btn.classList.add("option-correct");
-      if(btn.textContent===selected && selected!==correct) btn.classList.add("option-wrong");
-    }
-  });
+function handleDamage(correct) {
+  if(correct){
+    enemy.hp -= 20;
+    if(enemy.hp < 0) enemy.hp = 0;
 
-  let dmg = (selected===correct?20:0);
-  enemy.hp -= dmg;
-  if(enemy.hp<0) enemy.hp=0;
-  enemyHpBar.style.width = enemy.hp+"px";
-  enemyHpBar.textContent = enemy.hp;
-
-  // Update Stats
-  let user = JSON.parse(localStorage.getItem("quizterraUser")) || {};
-  if(!user.stats) user.stats = { correct:0, wrong:0 };
-  if(selected === correct) user.stats.correct += 1;
-  else user.stats.wrong += 1;
-  localStorage.setItem("quizterraUser", JSON.stringify(user));
-
-  if(selected!==correct) {
+    log(`✅ Correct! You dealt 20 damage.`);
+  } else {
     playerHp -= 15;
-    if(playerHp<0) playerHp=0;
-    playerHpBar.style.width = playerHp+"px";
-    playerHpBar.textContent = playerHp;
-    log("❌ Wrong answer! You lose 15 HP.");
-  } else log(`✅ Correct! You hit ${enemy.name} for ${dmg} damage.`);
+    if(playerHp < 0) playerHp = 0;
 
-  // Enemy counterattack
-  if(enemy.hp>0){
-    playerHp -= enemy.attack;
-    if(playerHp<0) playerHp=0;
-    playerHpBar.style.width = playerHp+"px";
-    playerHpBar.textContent = playerHp;
-    log(`${enemy.name} attacks you for ${enemy.attack} damage.`);
+    log(`❌ Wrong! You lost 15 HP.`);
   }
 
-  if(playerHp<=0){
+  updateBars();
+
+  if(enemy.hp <= 0){
+    winRound();
+    return;
+  }
+
+  if(playerHp <= 0){
     log("💀 You were defeated!");
-    Object.values(btns).forEach(b=>b.disabled=true);
+    disableButtons();
     return;
   }
 
-  if(enemy.hp<=0){
-    log(`✅ ${enemy.name} defeated!`);
-    playerHp += 10; // increase HP each round
-    playerHpBar.style.width = playerHp+"px";
-    playerHpBar.textContent = playerHp;
-    currentRound++;
-    if(currentRound>=enemyRounds.length){
-      log("🏆 You won the battle!");
-      return;
-    }
-    setTimeout(loadEnemy,1500);
+  // Enemy attack
+  playerHp -= enemy.attack;
+  if(playerHp < 0) playerHp = 0;
+
+  log(`${enemy.name} attacks for ${enemy.attack} damage!`);
+
+  updateBars();
+
+  if(playerHp <= 0){
+    log("💀 You were defeated!");
+    disableButtons();
     return;
   }
 
-  setTimeout(showQuestion,1000);
+  setTimeout(showQuestion, 800);
+}
+
+function updateBars(){
+  document.getElementById("enemy-hp").style.width = enemy.hp + "px";
+  document.getElementById("enemy-hp").innerText = enemy.hp;
+
+  document.getElementById("player-hp").style.width = playerHp + "px";
+  document.getElementById("player-hp").innerText = playerHp;
+}
+
+function disableButtons(){
+  btnRed.disabled = true;
+  btnOrange.disabled = true;
+  btnGreen.disabled = true;
+  btnBlue.disabled = true;
+  typingSubmit.disabled = true;
+}
+
+function winRound(){
+  log(`🏆 ${enemy.name} defeated!`);
+  currentRound++;
+
+  if(currentRound >= enemyRounds.length){
+    log("🎉 YOU WIN THE GAME!");
+    disableButtons();
+    return;
+  }
+
+  playerHp += 20;
+  if(playerHp > 100) playerHp = 100;
+
+  updateBars();
+  setTimeout(loadEnemy, 1200);
 }
 
 loadEnemy();
 </script>
+
 </body>
 </html>
