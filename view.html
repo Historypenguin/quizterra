@@ -18,28 +18,12 @@ body {margin:0; font-family:Poppins,sans-serif; display:flex; height:100vh; back
 .create-btn{background:rgba(255,255,255,0.25);padding:10px 18px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;color:white;transition:0.3s;}
 .create-btn:hover{background:rgba(255,255,255,0.35);transform:scale(1.05);}
 
-.set-card{background:rgba(255,255,255,0.18);padding:15px;border-radius:14px;backdrop-filter:blur(10px);box-shadow:0 8px 20px rgba(0,0,0,0.3);transition:0.3s;margin-bottom:15px;}
-.set-card h3{margin:0 0 8px 0;font-size:20px;font-weight:700;}
-.set-card p{font-size:13px;opacity:.9;}
-
-.card-btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
-.card-btns button{padding:6px 12px;border-radius:20px;border:none;font-weight:600;cursor:pointer;transition:0.3s;font-size:12px;}
-.edit-btn{background:#ffa500;color:white;}
-.edit-btn:hover{background:#ffb733;transform:scale(1.05);}
-.delete-btn{background:#ff4e4e;color:white;}
-.delete-btn:hover{background:#ff6b6b;transform:scale(1.05);}
-.play-btn{background:#00ff95;color:black;}
-.play-btn:hover{background:#33ffaa;transform:scale(1.05);}
-.view-btn{background:#4ecbff;color:black;}
-.view-btn:hover{background:#7edaff;transform:scale(1.05);}
-
 .question-block{background:rgba(0,0,0,0.2);padding:12px;border-radius:12px;margin-bottom:15px;}
 .question-block img{max-width:80%;height:auto;margin:4px 0;border-radius:6px;}
 
 .answers div{margin:4px 0;padding:8px;background:rgba(255,255,255,0.1);border-radius:6px;color:white;font-size:13px;}
 .correct{background:#00ff95;color:black;}
 
-/* Typing answer style */
 .typing-answer{
   background:#00c2ff !important;
   color:black;
@@ -60,7 +44,7 @@ body {margin:0; font-family:Poppins,sans-serif; display:flex; height:100vh; back
 
 <div class="main">
 <div class="top-row">
-<h1 id="setTitle">Set Title</h1>
+<h1 id="setTitle">Loading...</h1>
 <button class="create-btn" id="shareBtn">Share / Copy Link</button>
 </div>
 
@@ -68,7 +52,7 @@ body {margin:0; font-family:Poppins,sans-serif; display:flex; height:100vh; back
 <div id="questionsContainer"></div>
 
 <div class="card-btns" style="margin-top:15px;">
-  <button class="play-btn" id="playSetBtn">Play Set</button>
+  <button class="play-btn" id="playSetBtn" style="background:#00ff95;color:black;">Play Set</button>
 </div>
 </div>
 
@@ -93,64 +77,57 @@ body {margin:0; font-family:Poppins,sans-serif; display:flex; height:100vh; back
 const params = new URLSearchParams(window.location.search);
 const setId = params.get('setId');
 
-let sets = JSON.parse(localStorage.getItem('quizterraSets') || '[]');
-let setData = sets.find(s => s.id === setId);
+// Load sets from GitHub JSON
+fetch("https://historypenguin.github.io/quizterra/data/sets.json")
+  .then(res => res.json())
+  .then(json => {
+    const sets = json.sets || [];
+    const setData = sets.find(s => s.id === setId);
 
-let userLoggedIn = localStorage.getItem("quizterraUser") !== null;
-
-const playBtn = document.getElementById('playSetBtn');
-
-if(!setData){
-  document.getElementById('setTitle').innerText='Set Not Found';
-} else {
-  document.getElementById('setTitle').innerText=setData.name;
-  document.getElementById('privacyStatus').innerText='Privacy: '+(setData.privacy||'Public');
-
-  const container = document.getElementById('questionsContainer');
-
-  // Render questions & answers for everyone
-  setData.questions.forEach((q, i) => {
-    const div = document.createElement('div');
-    div.className = 'question-block';
-
-    if(q.type === "typing"){
-      div.innerHTML = `
-        <h3>Q${i+1}: ${q.question}</h3>
-        ${q.image ? `<img src='${q.image}'>` : ""}
-        <div class='answers'>
-          <div class='typing-answer'>Typing Answer: <b>${q.correct}</b></div>
-        </div>
-      `;
-    } else {
-      div.innerHTML = `
-        <h3>Q${i+1}: ${q.question}</h3>
-        ${q.image ? `<img src='${q.image}'>` : ""}
-        <div class='answers'>
-          ${q.options.map(opt =>
-            `<div class='${q.correct===opt ? "correct" : ""}'>${opt}</div>`
-          ).join("")}
-        </div>
-      `;
+    if(!setData){
+      document.getElementById('setTitle').innerText = "Set Not Found";
+      return;
     }
 
-    container.appendChild(div);
+    document.getElementById('setTitle').innerText = setData.name;
+    document.getElementById('privacyStatus').innerText = "Privacy: " + (setData.privacy || "Public");
+
+    const container = document.getElementById('questionsContainer');
+
+    // Render questions
+    setData.questions.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.className = "question-block";
+
+      if(q.type === "typing"){
+        div.innerHTML = `
+          <h3>Q${i+1}: ${q.question}</h3>
+          ${q.image ? `<img src="${q.image}" />` : ""}
+          <div class="answers">
+            <div class="typing-answer">Typing Answer: <b>${q.correct}</b></div>
+          </div>`;
+      } else {
+        div.innerHTML = `
+          <h3>Q${i+1}: ${q.question}</h3>
+          ${q.image ? `<img src="${q.image}" />` : ""}
+          <div class="answers">
+            ${q.options.map(opt =>
+              `<div class="${q.correct === opt ? 'correct' : ''}">${opt}</div>`
+            ).join("")}
+          </div>`;
+      }
+
+      container.appendChild(div);
+    });
+
   });
-}
 
-// Disable Play button for non-logged-in users
-if(!userLoggedIn){
-  playBtn.style.background = "gray";
-  playBtn.style.cursor = "not-allowed";
-  playBtn.style.opacity = "0.5";
-  playBtn.innerText = "Login Required";
-  playBtn.onclick = () => alert("You must be logged in to play game modes.");
-} else {
-  playBtn.onclick = () => {
-    window.location = `https://historypenguin.github.io/quizterra/play.html?setId=${setId}`;
-  };
-}
+// Play button always works
+document.getElementById("playSetBtn").onclick = () => {
+  window.location = `https://historypenguin.github.io/quizterra/play.html?setId=${setId}`;
+};
 
-// SHARE MODAL
+// Share Modal
 const modal = document.getElementById('shareModal');
 const shareInput = document.getElementById('shareInput');
 
