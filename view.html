@@ -100,15 +100,6 @@ let userLoggedIn = localStorage.getItem("quizterraUser") !== null;
 
 const playBtn = document.getElementById('playSetBtn');
 
-// If user isn't logged in → disable play button
-if (!userLoggedIn) {
-  playBtn.style.background = "gray";
-  playBtn.style.cursor = "not-allowed";
-  playBtn.style.opacity = "0.5";
-  playBtn.innerText = "Login Required";
-  playBtn.onclick = () => alert("You must be logged in to play game modes.");
-}
-
 if(!setData){
   document.getElementById('setTitle').innerText='Set Not Found';
 } else {
@@ -117,6 +108,7 @@ if(!setData){
 
   const container = document.getElementById('questionsContainer');
 
+  // Render questions & answers for everyone
   setData.questions.forEach((q, i) => {
     const div = document.createElement('div');
     div.className = 'question-block';
@@ -145,6 +137,20 @@ if(!setData){
   });
 }
 
+// Disable Play button for non-logged-in users
+if(!userLoggedIn){
+  playBtn.style.background = "gray";
+  playBtn.style.cursor = "not-allowed";
+  playBtn.style.opacity = "0.5";
+  playBtn.innerText = "Login Required";
+  playBtn.onclick = () => alert("You must be logged in to play game modes.");
+} else {
+  playBtn.onclick = () => {
+    window.location = `https://historypenguin.github.io/quizterra/play.html?setId=${setId}`;
+  };
+}
+
+// SHARE MODAL
 const modal = document.getElementById('shareModal');
 const shareInput = document.getElementById('shareInput');
 
@@ -172,13 +178,6 @@ function shareToPlatform(platform){
     case 'knowt': shareUrl=`https://www.knowt.com/share?url=${url}`;break;
   }
   window.open(shareUrl,'_blank');
-}
-
-// Only enable play button if logged in
-if (userLoggedIn) {
-  playBtn.onclick = () => {
-    window.location = `https://historypenguin.github.io/quizterra/play.html?setId=${setId}`;
-  };
 }
 </script>
 </body>
