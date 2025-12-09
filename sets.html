@@ -134,7 +134,7 @@
       border-radius: 14px;
       margin-bottom: 20px;
     }
-    input, textarea, select {
+    input, select {
       width: 100%;
       padding: 10px;
       margin-bottom: 12px;
@@ -144,68 +144,52 @@
     }
   </style>
 </head>
-
 <body>
-  <div class="sidebar">
-    <h2>QUIZTERRA</h2>
-    <a href="stats.html"><i class="fas fa-chart-line"></i> Stats</a>
-    <a href="market.html"><i class="fas fa-store"></i> Market</a>
-    <a href="inventory.html"><i class="fas fa-box"></i> Inventory</a>
-    <a href="sets.html" class="active"><i class="fas fa-layer-group"></i> Sets</a>
-    <a id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+<div class="sidebar">
+  <h2>QUIZTERRA</h2>
+  <a href="stats.html"><i class="fas fa-chart-line"></i> Stats</a>
+  <a href="market.html"><i class="fas fa-store"></i> Market</a>
+  <a href="inventory.html"><i class="fas fa-box"></i> Inventory</a>
+  <a href="sets.html" class="active"><i class="fas fa-layer-group"></i> Sets</a>
+  <a id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<div class="main">
+  <div class="top-row">
+    <h1>My Sets</h1>
+    <button class="create-btn" onclick="toggleCreateForm()">+ Create Set</button>
   </div>
 
-  <div class="main">
-    <div class="top-row">
-      <h1>My Sets</h1>
-      <button class="create-btn" onclick="toggleCreateForm()">+ Create Set</button>
-    </div>
-
-    <!-- Create Set Form -->
-    <div id="createSetForm">
-      <h2>Create New Set</h2>
-      <input type="text" id="setName" placeholder="Set Name">
-
-      <!-- Privacy -->
-      <label style="font-weight:700;">Privacy</label>
-      <select id="setPrivacy">
-        <option value="public">Public</option>
-        <option value="unlisted">Unlisted</option>
-        <option value="private">Private</option>
-      </select>
-
-      <!-- Add Question Container -->
-      <div id="questionsContainer"></div>
-      <button onclick="addQuestion()">+ Add Question</button>
-      <br><br>
-      <button id="saveSetBtn" onclick="createSet()">Save Set</button>
-    </div>
-
-    <div class="sets-grid" id="setsGrid"></div>
+  <div id="createSetForm">
+    <h2>Create New Set</h2>
+    <input type="text" id="setName" placeholder="Set Name">
+    <label style="font-weight:700;">Privacy</label>
+    <select id="setPrivacy">
+      <option value="public">Public</option>
+      <option value="unlisted">Unlisted</option>
+      <option value="private">Private</option>
+    </select>
+    <div id="questionsContainer"></div>
+    <button onclick="addQuestion()">+ Add Question</button>
+    <br><br>
+    <button id="saveSetBtn" onclick="createSet()">Save Set</button>
   </div>
+
+  <div class="sets-grid" id="setsGrid"></div>
+</div>
 
 <script>
 let user = JSON.parse(localStorage.getItem("quizterraUser"));
-if (!user) window.location = "login.html";
+if(!user) window.location = "login.html";
 let sets = JSON.parse(localStorage.getItem("quizterraSets")) || [];
 
-// Load Sets
-function loadSets() {
+function loadSets(){
   const container = document.getElementById("setsGrid");
   container.innerHTML = "";
-  const mySets = sets.filter(s => s.owner === user.username);
-
-  if (mySets.length === 0) {
-    container.innerHTML = "<h2>You have no sets. Create one!</h2>";
-    return;
-  }
-
-  mySets.forEach(set => {
-    const shareBtn = 
-      set.privacy !== "private"
-        ? `<button class="view-btn" onclick="viewSet('${set.id}')">View / Share</button>`
-        : "";
-
+  const mySets = sets.filter(s=>s.owner===user.username);
+  if(mySets.length===0){ container.innerHTML="<h2>You have no sets. Create one!</h2>"; return; }
+  mySets.forEach(set=>{
+    const shareBtn = set.privacy!=="private" ? `<button class="view-btn" onclick="viewSet('${set.id}')">View / Share</button>` : "";
     container.innerHTML += `
       <div class="set-card">
         <h3>${set.name}</h3>
@@ -222,153 +206,156 @@ function loadSets() {
   });
 }
 
-// Toggle Create Form
-function toggleCreateForm() {
-  const form = document.getElementById("createSetForm");
-  form.style.display = form.style.display === "none" ? "block" : "none";
+function toggleCreateForm(){
+  const f=document.getElementById("createSetForm");
+  f.style.display = f.style.display==="none"?"block":"none";
 }
 
-// Add Question
-function addQuestion() {
-  const container = document.getElementById("questionsContainer");
-  const html = `
-    <div class="question-block">
-      <input type="text" class="q-text" placeholder="Question Text">
-      <input type="text" class="q-img" placeholder="Image/GIF URL (optional)">
+function addQuestion(){
+  const container=document.getElementById("questionsContainer");
+  const html=`<div class="question-block">
+    <input type="text" class="q-text" placeholder="Question Text">
+    <input type="text" class="q-img" placeholder="Image/GIF URL (optional)">
+    <select class="q-type">
+      <option value="mc">Multiple Choice</option>
+      <option value="typing">Typing Answer</option>
+    </select>
+    <div class="mc-options">
       <input type="text" class="opt1" placeholder="Option 1">
       <input type="text" class="opt2" placeholder="Option 2">
       <input type="text" class="opt3" placeholder="Option 3">
       <input type="text" class="opt4" placeholder="Option 4">
-      <select class="q-correct">
-        <option value="" disabled selected>Select Correct Answer</option>
-      </select>
-      <select class="q-type">
-        <option value="mc">Multiple Choice</option>
-        <option value="typing">Typing Answer</option>
-      </select>
+      <select class="q-correct"><option value="" disabled selected>Select Correct Answer</option></select>
     </div>
-  `;
+    <input type="text" class="typing-answer" placeholder="Typing Answer" style="display:none;">
+  </div>`;
   container.insertAdjacentHTML("beforeend", html);
-  const block = container.lastElementChild;
-  block.querySelectorAll(".opt1, .opt2, .opt3, .opt4").forEach(input => {
-    input.addEventListener("input", () => updateCorrectDropdown(block));
+  const block=container.lastElementChild;
+
+  const typeSelect = block.querySelector(".q-type");
+  const mcDiv = block.querySelector(".mc-options");
+  const typingInput = block.querySelector(".typing-answer");
+
+  typeSelect.addEventListener("change", ()=>{
+    if(typeSelect.value==="mc"){
+      mcDiv.style.display="block";
+      typingInput.style.display="none";
+    }else{
+      mcDiv.style.display="none";
+      typingInput.style.display="block";
+    }
+  });
+
+  block.querySelectorAll(".opt1,.opt2,.opt3,.opt4").forEach(input=>{
+    input.addEventListener("input", ()=>updateCorrectDropdown(block));
   });
 }
 
-// Update Correct Dropdown
-function updateCorrectDropdown(block) {
-  const select = block.querySelector(".q-correct");
-  const opts = [
+function updateCorrectDropdown(block){
+  const select=block.querySelector(".q-correct");
+  const opts=[
     block.querySelector(".opt1").value.trim(),
     block.querySelector(".opt2").value.trim(),
     block.querySelector(".opt3").value.trim(),
     block.querySelector(".opt4").value.trim()
   ];
-  select.innerHTML = `<option value="" disabled selected>Select Correct Answer</option>` +
-    opts.map(o => `<option value="${o}">${o || "Untitled Option"}</option>`).join("");
+  select.innerHTML=`<option value="" disabled selected>Select Correct Answer</option>`+
+    opts.map(o=>`<option value="${o}">${o||"Untitled Option"}</option>`).join("");
 }
 
-// Create Set
-function createSet() {
-  const name = document.getElementById("setName").value.trim();
-  const privacy = document.getElementById("setPrivacy").value;
-  if (!name) return alert("Enter a set name.");
-  const blocks = [...document.querySelectorAll(".question-block")];
-  if (blocks.length === 0) return alert("Add at least one question.");
+function createSet(){
+  const name=document.getElementById("setName").value.trim();
+  const privacy=document.getElementById("setPrivacy").value;
+  if(!name) return alert("Enter a set name.");
+  const blocks=[...document.querySelectorAll(".question-block")];
+  if(blocks.length===0) return alert("Add at least one question.");
 
-  const questionData = blocks.map(block => ({
-    question: block.querySelector(".q-text").value.trim(),
-    image: block.querySelector(".q-img").value.trim(),
-    options: [
-      block.querySelector(".opt1").value.trim(),
-      block.querySelector(".opt2").value.trim(),
-      block.querySelector(".opt3").value.trim(),
-      block.querySelector(".opt4").value.trim()
-    ],
-    correct: block.querySelector(".q-correct").value,
-    type: block.querySelector(".q-type").value
-  }));
-
-  const newSet = { id: Date.now().toString(), name, owner: user.username, privacy, questions: questionData };
-  sets.push(newSet);
-  localStorage.setItem("quizterraSets", JSON.stringify(sets));
-  alert("Set Created!");
-  location.reload();
-}
-
-// Edit, Delete, Play, View
-function editSet(id) {
-  const set = sets.find(s => s.id === id);
-  if (!set) return alert("Set not found!");
-  toggleCreateForm();
-  document.getElementById("setName").value = set.name;
-  document.getElementById("setPrivacy").value = set.privacy;
-
-  const container = document.getElementById("questionsContainer");
-  container.innerHTML = ""; 
-
-  set.questions.forEach(q => {
-    const html = `
-      <div class="question-block">
-        <input type="text" class="q-text" value="${q.question}">
-        <input type="text" class="q-img" value="${q.image}">
-        <input type="text" class="opt1" value="${q.options[0]}">
-        <input type="text" class="opt2" value="${q.options[1]}">
-        <input type="text" class="opt3" value="${q.options[2]}">
-        <input type="text" class="opt4" value="${q.options[3]}">
-        <select class="q-correct"></select>
-        <select class="q-type">
-          <option value="mc" ${q.type==="mc"?"selected":""}>Multiple Choice</option>
-          <option value="typing" ${q.type==="typing"?"selected":""}>Typing Answer</option>
-        </select>
-      </div>
-    `;
-    container.insertAdjacentHTML("beforeend", html);
-    const block = container.lastElementChild;
-    updateCorrectDropdown(block);
-    block.querySelector(`.q-correct option[value="${q.correct}"]`)?.setAttribute("selected","selected");
-    block.querySelectorAll(".opt1, .opt2, .opt3, .opt4").forEach(input => {
-      input.addEventListener("input", () => updateCorrectDropdown(block));
-    });
-  });
-
-  const saveBtn = document.getElementById("saveSetBtn");
-  saveBtn.textContent = "Update Set";
-  saveBtn.onclick = function() {
-    const name = document.getElementById("setName").value.trim();
-    const privacy = document.getElementById("setPrivacy").value;
-    const blocks = [...document.querySelectorAll(".question-block")];
-    const questionData = blocks.map(block => ({
+  const questionData=blocks.map(block=>{
+    const type = block.querySelector(".q-type").value;
+    return {
       question: block.querySelector(".q-text").value.trim(),
       image: block.querySelector(".q-img").value.trim(),
-      options: [
+      type,
+      options: type==="mc"?[
         block.querySelector(".opt1").value.trim(),
         block.querySelector(".opt2").value.trim(),
         block.querySelector(".opt3").value.trim(),
         block.querySelector(".opt4").value.trim()
-      ],
-      correct: block.querySelector(".q-correct").value,
-      type: block.querySelector(".q-type").value
-    }));
-    set.name = name;
-    set.privacy = privacy;
-    set.questions = questionData;
-    localStorage.setItem("quizterraSets", JSON.stringify(sets));
-    alert("Set Updated!");
-    location.reload();
+      ]:[],
+      correct: type==="mc"?block.querySelector(".q-correct").value:block.querySelector(".typing-answer").value.trim()
+    };
+  });
+
+  const newSet={id:Date.now().toString(),name,owner:user.username,privacy,questions:questionData};
+  sets.push(newSet);
+  localStorage.setItem("quizterraSets",JSON.stringify(sets));
+  alert("Set Created!"); location.reload();
+}
+
+function editSet(id){
+  const set=sets.find(s=>s.id===id); if(!set) return alert("Set not found!");
+  toggleCreateForm();
+  document.getElementById("setName").value=set.name;
+  document.getElementById("setPrivacy").value=set.privacy;
+  const container=document.getElementById("questionsContainer"); container.innerHTML="";
+  set.questions.forEach(q=>{
+    addQuestion();
+    const block=container.lastElementChild;
+    block.querySelector(".q-text").value=q.question;
+    block.querySelector(".q-img").value=q.image;
+    block.querySelector(".q-type").value=q.type;
+    const typeSelect = block.querySelector(".q-type");
+    const mcDiv = block.querySelector(".mc-options");
+    const typingInput = block.querySelector(".typing-answer");
+    if(q.type==="mc"){
+      mcDiv.style.display="block"; typingInput.style.display="none";
+      block.querySelector(".opt1").value=q.options[0];
+      block.querySelector(".opt2").value=q.options[1];
+      block.querySelector(".opt3").value=q.options[2];
+      block.querySelector(".opt4").value=q.options[3];
+      updateCorrectDropdown(block);
+      block.querySelector(`.q-correct option[value="${q.correct}"]`)?.setAttribute("selected","selected");
+    }else{
+      mcDiv.style.display="none"; typingInput.style.display="block"; typingInput.value=q.correct;
+    }
+    typeSelect.addEventListener("change", ()=>{
+      if(typeSelect.value==="mc"){ mcDiv.style.display="block"; typingInput.style.display="none"; }
+      else{ mcDiv.style.display="none"; typingInput.style.display="block"; }
+    });
+    block.querySelectorAll(".opt1,.opt2,.opt3,.opt4").forEach(input=>{
+      input.addEventListener("input", ()=>updateCorrectDropdown(block));
+    });
+  });
+  const saveBtn=document.getElementById("saveSetBtn"); saveBtn.textContent="Update Set";
+  saveBtn.onclick=function(){
+    const name=document.getElementById("setName").value.trim();
+    const privacy=document.getElementById("setPrivacy").value;
+    const blocks=[...document.querySelectorAll(".question-block")];
+    const questionData=blocks.map(block=>{
+      const type = block.querySelector(".q-type").value;
+      return {
+        question: block.querySelector(".q-text").value.trim(),
+        image: block.querySelector(".q-img").value.trim(),
+        type,
+        options: type==="mc"?[
+          block.querySelector(".opt1").value.trim(),
+          block.querySelector(".opt2").value.trim(),
+          block.querySelector(".opt3").value.trim(),
+          block.querySelector(".opt4").value.trim()
+        ]:[],
+        correct: type==="mc"?block.querySelector(".q-correct").value:block.querySelector(".typing-answer").value.trim()
+      };
+    });
+    set.name=name; set.privacy=privacy; set.questions=questionData;
+    localStorage.setItem("quizterraSets",JSON.stringify(sets));
+    alert("Set Updated!"); location.reload();
   };
 }
 
-function playSet(id) { window.location = `play.html?setId=${id}`; }
-function viewSet(id) { window.location = `view.html?setId=${id}`; }
-function deleteSet(id) {
-  if (confirm("Delete this set?")) {
-    sets = sets.filter(s => s.id != id);
-    localStorage.setItem("quizterraSets", JSON.stringify(sets));
-    loadSets();
-  }
-}
-document.getElementById("logoutBtn").onclick = () => { localStorage.removeItem("quizterraUser"); window.location = "login.html"; };
+function playSet(id){ window.location=`play.html?setId=${id}`; }
+function viewSet(id){ window.location=`view.html?setId=${id}`; }
+function deleteSet(id){ if(confirm("Delete this set?")){ sets=sets.filter(s=>s.id!=id); localStorage.setItem("quizterraSets",JSON.stringify(sets)); loadSets(); } }
+document.getElementById("logoutBtn").onclick=()=>{ localStorage.removeItem("quizterraUser"); window.location="login.html"; };
 loadSets();
 </script>
 </body>
