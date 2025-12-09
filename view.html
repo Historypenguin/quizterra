@@ -85,6 +85,7 @@ body {margin:0; font-family:Poppins,sans-serif; display:flex; height:100vh; back
 <button class="view-btn" onclick="shareToPlatform('blooket')">Blooket</button>
 <button class="view-btn" onclick="shareToPlatform('gimkit')">Gimkit</button>
 <button class="view-btn" onclick="shareToPlatform('knowt')">Knowt</button>
+<button class="view-btn" onclick="shareToPlatform('inquiziti')">Inquiziti</button>
 </div>
 </div>
 </div>
@@ -108,7 +109,7 @@ if(!setData){
     const div=document.createElement('div');
     div.className='question-block';
 
-    // ★ Detect typing answer
+    // Typing answer support
     if(q.type === "typing"){
       div.innerHTML = `
         <h3>Q${i+1}: ${q.question}</h3>
@@ -133,6 +134,7 @@ if(!setData){
   });
 }
 
+// ----- SHARE MODAL -----
 const modal=document.getElementById('shareModal');
 const shareInput=document.getElementById('shareInput');
 
@@ -151,19 +153,38 @@ document.getElementById('copyBtn').onclick=()=>{
 };
 
 function shareToPlatform(platform){
-  const url=encodeURIComponent(window.location.href);
-  let shareUrl="";
+  const url = encodeURIComponent(window.location.href);
+  let shareUrl = "";
+
   switch(platform){
-    case 'classroom': shareUrl=`https://classroom.google.com/share?url=${url}`;break;
-    case 'blooket': shareUrl=`https://www.blooket.com/play?link=${url}`;break;
-    case 'gimkit': shareUrl=`https://www.gimkit.com/share?url=${url}`;break;
-    case 'knowt': shareUrl=`https://www.knowt.com/share?url=${url}`;break;
+    case 'classroom': shareUrl=`https://classroom.google.com/share?url=${url}`; break;
+    case 'blooket': shareUrl=`https://www.blooket.com/play?link=${url}`; break;
+    case 'gimkit': shareUrl=`https://www.gimkit.com/share?url=${url}`; break;
+    case 'knowt': shareUrl=`https://www.knowt.com/share?url=${url}`; break;
+    case 'inquiziti': shareUrl=`https://inquiziti.com/share?link=${url}`; break;
   }
-  window.open(shareUrl,'_blank');
+
+  window.open(shareUrl, '_blank');
 }
 
-document.getElementById('playSetBtn').onclick=()=>{
-  window.location=`https://historypenguin.github.io/quizterra/play.html?setId=${setId}`;
+// ----- LOGIN CHECK → Disable Play Button -----
+let loggedInUser = localStorage.getItem("quizterraUser");
+const playBtn = document.getElementById("playSetBtn");
+
+if(!loggedInUser){
+  playBtn.disabled = true;
+  playBtn.style.opacity = "0.4";
+  playBtn.style.cursor = "not-allowed";
+  playBtn.innerText = "Login Required";
+}
+
+playBtn.onclick = () => {
+  let user = localStorage.getItem("quizterraUser");
+  if(!user){
+    alert("You must be logged in to play this set.");
+    return;
+  }
+  window.location = `https://historypenguin.github.io/quizterra/play.html?setId=${setId}`;
 };
 </script>
 </body>
