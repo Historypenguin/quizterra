@@ -103,6 +103,9 @@ if(!set) {
   window.location = "select.html";
 }
 
+// Save the set in localStorage so game pages can access typing answers
+localStorage.setItem("currentSet", JSON.stringify(set));
+
 // Update title/description
 document.getElementById("setTitle").textContent = set.name;
 document.getElementById("setDesc").textContent = set.description || "Select a game mode below:";
@@ -115,7 +118,7 @@ document.getElementById("studyBtn").onclick = () => {
   window.location = `study.html?setId=${setId}`;
 };
 document.getElementById("defenseBtn").onclick = () => {
-  window.location = `?setId=${setId}`;
+  window.location = `space-defense.html?setId=${setId}`;
 };
 </script>
 
