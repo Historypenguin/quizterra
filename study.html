@@ -120,6 +120,15 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
 }
 #nextBtn:hover { background: #a23bff; }
 #nextBtn:disabled { background: rgba(142,45,226,0.5); cursor: not-allowed; }
+
+#typingInput {
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: none;
+  width: 100%;
+  margin-top: 10px;
+}
 </style>
 </head>
 <body>
@@ -143,13 +152,14 @@ h2 { text-align: center; font-size: 28px; margin: 0; }
   <h2 id="setTitle">Loading...</h2>
   <div class="question-box" id="questionBox"></div>
 
-  <div class="options-grid">
+  <div class="options-grid" id="optionsGrid">
     <button class="option-btn red" id="btnRed"></button>
     <button class="option-btn orange" id="btnOrange"></button>
     <button class="option-btn green" id="btnGreen"></button>
     <button class="option-btn blue" id="btnBlue"></button>
   </div>
 
+  <input type="text" id="typingInput" placeholder="Type your answer here" style="display:none;">
   <button id="nextBtn" disabled>Next Question</button>
 </div>
 
@@ -170,6 +180,8 @@ document.getElementById("setTitle").textContent = set.name;
 let currentQuestion = 0;
 const questionBox = document.getElementById("questionBox");
 const nextBtn = document.getElementById("nextBtn");
+const optionsGrid = document.getElementById("optionsGrid");
+const typingInput = document.getElementById("typingInput");
 
 const btns = {
   Red: document.getElementById("btnRed"),
@@ -204,19 +216,14 @@ document.getElementById("endBtn").onclick = () => {
   if(confirm("End study session now?")) window.location="select.html";
 }
 
-// Show question exactly as set
+// Show question
 function showQuestion(index) {
   const q = set.questions[index];
-  
-  // Clear previous content
   questionBox.innerHTML = "";
-
-  // Add text
   const questionText = document.createElement("div");
   questionText.textContent = q.question;
   questionBox.appendChild(questionText);
 
-  // Add image if present
   if(q.image) {
     const img = document.createElement("img");
     img.src = q.image;
@@ -230,19 +237,31 @@ function showQuestion(index) {
 
   nextBtn.disabled = true;
 
-  const colors = ["Red","Orange","Green","Blue"];
-  colors.forEach((color, i) => {
-    const btn = btns[color];
-    btn.disabled = false;
-    btn.classList.remove("option-correct","option-wrong");
-    btn.textContent = q.options[i] || "";
-    btn.onclick = () => selectAnswer(btn.textContent, q.correct); // updated: use q.correct
-  });
+  if(q.type === "typing") {
+    optionsGrid.style.display = "none";
+    typingInput.style.display = "block";
+    typingInput.value = "";
+    typingInput.disabled = false;
+
+    typingInput.oninput = () => { nextBtn.disabled = typingInput.value.trim() === ""; };
+  } else {
+    optionsGrid.style.display = "grid";
+    typingInput.style.display = "none";
+
+    const colors = ["Red","Orange","Green","Blue"];
+    colors.forEach((color, i) => {
+      const btn = btns[color];
+      btn.disabled = false;
+      btn.classList.remove("option-correct","option-wrong");
+      btn.textContent = q.options[i] || "";
+      btn.onclick = () => selectAnswer(btn.textContent, q.correct);
+    });
+  }
 
   questionBox.style.fontSize = bigFontCheckbox.checked ? "28px" : "20px";
 }
 
-// Select answer
+// Select answer for buttons
 function selectAnswer(selectedText, correctText) {
   Object.values(btns).forEach(btn => btn.disabled = true);
 
@@ -264,8 +283,18 @@ function selectAnswer(selectedText, correctText) {
   nextBtn.disabled = false;
 }
 
-// Next question
+// Select answer for typing input
 nextBtn.onclick = () => {
+  const q = set.questions[currentQuestion];
+  if(q.type === "typing") {
+    const answer = typingInput.value.trim();
+    if(!user.stats) user.stats = { level:0, xp:0, coins:0, gamesPlayed:0, correct:0, wrong:0, studyWeeks:0 };
+    const stats = user.stats;
+    if(answer.toLowerCase() === q.correct.toLowerCase()) stats.correct++;
+    else stats.wrong++;
+    typingInput.disabled = true;
+  }
+  
   currentQuestion++;
   if(currentQuestion >= set.questions.length){
     user.stats.gamesPlayed++;
