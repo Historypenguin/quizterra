@@ -286,7 +286,7 @@ function createSet(){
     };
   });
 
-  const newSet={id:Date.now().toString(),name,owner=user.username,privacy,questions:questionData};
+  const newSet={id:Date.now().toString(),name,owner:user.username,privacy,questions:questionData};
   sets.push(newSet);
   localStorage.setItem("quizterraSets",JSON.stringify(sets));
   alert("Set Created!"); location.reload();
@@ -358,34 +358,5 @@ function deleteSet(id){ if(confirm("Delete this set?")){ sets=sets.filter(s=>s.i
 document.getElementById("logoutBtn").onclick=()=>{ localStorage.removeItem("quizterraUser"); window.location="login.html"; };
 loadSets();
 </script>
-
-<!-- ✅ COMPUTER-ONLY MODE -->
-<script>
-const isMobile = /Mobi|Android|iPad|iPod|Tablet/i.test(navigator.userAgent);
-
-if (isMobile) {
-    document.body.innerHTML = `
-        <div style="
-            display:flex;
-            height:100vh;
-            justify-content:center;
-            align-items:center;
-            text-align:center;
-            font-family:Poppins,sans-serif;
-            color:white;
-            background:#1a1a1a;
-            padding:20px;
-        ">
-            <div>
-                <h1 style="font-size:32px;">Computer Required</h1>
-                <p style="font-size:18px;margin-top:10px;opacity:0.75;">
-                    Quizterra Sets can only be used on a computer.
-                </p>
-            </div>
-        </div>
-    `;
-}
-</script>
-
 </body>
 </html>
